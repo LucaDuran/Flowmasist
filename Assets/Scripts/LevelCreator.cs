@@ -9,7 +9,7 @@ public class LevelCreator : MonoBehaviour
     [SerializeField] private Transform cellFather;
     [SerializeField] private float cellSize;
     private Cell[,] grid;
-    private void Build(LevelData levelData)
+    public void Build(LevelData levelData)
     {
         GenerateGrid(levelData.Rows, levelData.Columns);
         ApllyLevelRules(levelData);
