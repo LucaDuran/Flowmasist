@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "New Construction Card", menuName = "Cards/Construction Card")]
 public class CardConstruction : Card
 {
     public enum ConstructionType

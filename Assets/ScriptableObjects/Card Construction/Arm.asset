@@ -9,13 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48366fa462630964199c8f31a6dcf532, type: 3}
-  m_Name: Level1
+  m_Script: {fileID: 11500000, guid: 4271029cc54f50945bcc96d0fbb63f60, type: 3}
+  m_Name: Arm
   m_EditorClassIdentifier: 
-  levelName: Level1
-  rows: 30
-  columns: 10
-  extractZone: []
-  lowEnergyZone: []
-  cantBuild: []
+  cardName: Arm
+  cardIcon: {fileID: 0}
+  moveCost: 0
+  shopPrice: 0
+  constructionType: 3
   canRotate: 0
+  instancePrefab: {fileID: 8366754943217136126, guid: bfba322c6a19297498b2e4a65c55afcd, type: 3}
+  size: {x: 1, y: 1}

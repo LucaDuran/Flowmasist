@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class LevelCreator : MonoBehaviour
@@ -44,6 +43,10 @@ public class LevelCreator : MonoBehaviour
         {
             grid[pos.x, pos.y].SetIsLowEnergyZone(true);
         }
+    }
+    public Cell GetCell(int row, int column)
+    {
+        return grid[row, column];
     }
 
     void Start()

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48366fa462630964199c8f31a6dcf532, type: 3}
+  m_Name: Level1
+  m_EditorClassIdentifier: 
+  levelName: Level1
+  rows: 30
+  columns: 10
+  maxMoves: 0
+  extractZone: []
+  lowEnergyZone: []
+  cantBuild: []
+  canRotate: 0

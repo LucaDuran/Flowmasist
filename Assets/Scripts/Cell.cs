@@ -6,6 +6,7 @@ public class Cell : MonoBehaviour
 {
     private Vector2Int gridPosition;
     private bool canBuild;
+    public bool CanBuild => canBuild;
     private bool isLowEnergyZone;
     private bool isExtractionZone;
 
