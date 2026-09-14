@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Cell : MonoBehaviour
 {
+    private CardPlacementManager cardPlacementManager;
     private Vector2Int gridPosition;
     private bool canBuild;
     public bool CanBuild => canBuild;
@@ -28,6 +30,18 @@ public class Cell : MonoBehaviour
     public void SetIsLowEnergyZone(bool isLowEnergyZone)
     {
         this.isLowEnergyZone = isLowEnergyZone;
+    }
+    public void SetCardPlacementManager(CardPlacementManager manager)
+    {
+        cardPlacementManager = manager;
+    }
+    public void OnMouseDown()
+    {
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+        cardPlacementManager.OnCellSelected(this);
     }
 
     void Start()

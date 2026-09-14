@@ -15,7 +15,7 @@ MonoBehaviour:
   levelName: Level1
   rows: 30
   columns: 10
-  maxMoves: 0
+  maxMoves: 500
   extractZone: []
   lowEnergyZone: []
   cantBuild: []

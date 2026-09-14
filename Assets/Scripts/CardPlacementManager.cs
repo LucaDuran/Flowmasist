@@ -5,6 +5,7 @@ public class CardPlacementManager : MonoBehaviour
 {
     [SerializeField] private LevelCreator levelCreator;
     [SerializeField] private DeckManager deckManager;
+    [SerializeField] private HandUI handUI;
     private Card cardSelected;
     private Cell cellSelected;
     private int maxMoves;
@@ -56,6 +57,7 @@ public class CardPlacementManager : MonoBehaviour
         }
         Instantiate(construction.InstancePrefab, cellSelected.transform.position, Quaternion.identity);
         deckManager.DiscardCard(cardSelected);
+        handUI.RefreshHand();
         movesUsed += cardSelected.MoveCost;
         cardSelected = null;
         cellSelected = null;

@@ -7,6 +7,7 @@ public class LevelCreator : MonoBehaviour
     [SerializeField] private GameObject cellPrefab;
     [SerializeField] private Transform cellFather;
     [SerializeField] private float cellSize;
+    [SerializeField] private CardPlacementManager cardPlacementManager;
     private Cell[,] grid;
     public void Build(LevelData levelData)
     {
@@ -25,6 +26,7 @@ public class LevelCreator : MonoBehaviour
                 GameObject newCellObject = Instantiate(cellPrefab, worldPos, Quaternion.identity, cellFather);
                 Cell cell = newCellObject.GetComponent<Cell>();
                 cell.Initialize(gridPos, true, false, false);
+                cell.SetCardPlacementManager(cardPlacementManager);
                 grid[i, j] = cell;
             }
         }

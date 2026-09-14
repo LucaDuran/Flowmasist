@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     {
         levelCreator.Build(currentLevel);
         deckManager.StartDeck(deckData);
+        cardPlacementManager.StartLevel(currentLevel);
         deckManager.DealCards();
         handUI.RefreshHand();
         deckManager.DiscardCards(new List<Card> { deckManager.Hand[0], deckManager.Hand[1] });
