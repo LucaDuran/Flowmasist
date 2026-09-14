@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: 
   cardIcon: {fileID: 0}
-  moveCost: 0
+  moveCost: 30
   shopPrice: 0
   constructionType: 0
   canRotate: 0

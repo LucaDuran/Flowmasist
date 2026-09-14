@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: ConveyorBelt
   cardIcon: {fileID: 0}
-  moveCost: 0
+  moveCost: 5
   shopPrice: 0
   constructionType: 2
   canRotate: 0

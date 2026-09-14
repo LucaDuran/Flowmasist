@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: Arm
   cardIcon: {fileID: 0}
-  moveCost: 0
+  moveCost: 20
   shopPrice: 0
   constructionType: 3
   canRotate: 0

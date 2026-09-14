@@ -14,5 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deckName: Starter
   cards:
-  - {fileID: 11400000, guid: 0efe096136cd52b428743d8b6e3edfa9, type: 2}
   - {fileID: 11400000, guid: 93aef6d536252e54fb53408bdeb369c6, type: 2}
+  - {fileID: 11400000, guid: 93aef6d536252e54fb53408bdeb369c6, type: 2}
+  - {fileID: 11400000, guid: 93aef6d536252e54fb53408bdeb369c6, type: 2}
+  - {fileID: 11400000, guid: 93aef6d536252e54fb53408bdeb369c6, type: 2}
+  - {fileID: 11400000, guid: 0efe096136cd52b428743d8b6e3edfa9, type: 2}
+  - {fileID: 11400000, guid: 0efe096136cd52b428743d8b6e3edfa9, type: 2}
+  - {fileID: 11400000, guid: 0efe096136cd52b428743d8b6e3edfa9, type: 2}
+  - {fileID: 11400000, guid: 65ccb785a877fbb438929d92a2419970, type: 2}
