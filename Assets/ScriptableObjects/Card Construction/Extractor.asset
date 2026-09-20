@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4271029cc54f50945bcc96d0fbb63f60, type: 3}
   m_Name: Extractor
   m_EditorClassIdentifier: 
-  cardName: 
+  cardName: Extractor
   cardIcon: {fileID: 0}
   moveCost: 30
   shopPrice: 0
   constructionType: 0
   canRotate: 0
-  instancePrefab: {fileID: 8366754943217136126, guid: bfba322c6a19297498b2e4a65c55afcd, type: 3}
+  instancePrefab: {fileID: 2719004954532872108, guid: d53ffa7b6e34dfd438e4447eb56ae6e2, type: 3}
   size: {x: 1, y: 1}

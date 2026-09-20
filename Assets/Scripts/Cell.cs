@@ -6,7 +6,13 @@ using UnityEngine.EventSystems;
 public class Cell : MonoBehaviour
 {
     private CardPlacementManager cardPlacementManager;
+    private ResourceItem resourceItem;
+    public ResourceItem ResourceItem => resourceItem;
+    private GameObject currentConstruction;
+    public GameObject CurrentConstruction => currentConstruction;
+    public bool IsBusy => currentConstruction != null;
     private Vector2Int gridPosition;
+    public Vector2Int GridPosition => gridPosition;
     private bool canBuild;
     public bool CanBuild => canBuild;
     private bool isLowEnergyZone;
@@ -34,6 +40,14 @@ public class Cell : MonoBehaviour
     public void SetCardPlacementManager(CardPlacementManager manager)
     {
         cardPlacementManager = manager;
+    }
+    public void SetCurrentConstruction(GameObject construction)
+    {
+        currentConstruction = construction;
+    }
+    public void SetResourceItem(ResourceItem resource)
+    {
+        resourceItem = resource;
     }
     public void OnMouseDown()
     {

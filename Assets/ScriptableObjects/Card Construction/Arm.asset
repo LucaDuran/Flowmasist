@@ -18,5 +18,5 @@ MonoBehaviour:
   shopPrice: 0
   constructionType: 3
   canRotate: 0
-  instancePrefab: {fileID: 8366754943217136126, guid: bfba322c6a19297498b2e4a65c55afcd, type: 3}
+  instancePrefab: {fileID: 2719004954532872108, guid: a583f21b1a207fe4fb6567afec6993b7, type: 3}
   size: {x: 1, y: 1}

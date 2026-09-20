@@ -22,10 +22,10 @@ public class LevelCreator : MonoBehaviour
             for (int j = 0; j < columns; j++)
             {
                 Vector2Int gridPos = new Vector2Int(i, j);
-                Vector3 worldPos = new Vector3(i * cellSize, 0, j * cellSize);
+                Vector3 worldPos = cellFather.position + new Vector3(i * cellSize, 0, j * cellSize);
                 GameObject newCellObject = Instantiate(cellPrefab, worldPos, Quaternion.identity, cellFather);
                 Cell cell = newCellObject.GetComponent<Cell>();
-                cell.Initialize(gridPos, true, false, false);
+                cell.Initialize(gridPos, true, true, false);
                 cell.SetCardPlacementManager(cardPlacementManager);
                 grid[i, j] = cell;
             }
@@ -48,6 +48,11 @@ public class LevelCreator : MonoBehaviour
     }
     public Cell GetCell(int row, int column)
     {
+        if (row < 0 || row >= grid.GetLength(0) || column < 0 || column >= grid.GetLength(1))
+        {
+            Debug.LogWarning($"Cell position ({row}, {column}) is out of bounds.");
+            return null;
+        }
         return grid[row, column];
     }
 

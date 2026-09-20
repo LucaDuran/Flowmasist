@@ -6,6 +6,7 @@ public class CardPlacementManager : MonoBehaviour
     [SerializeField] private LevelCreator levelCreator;
     [SerializeField] private DeckManager deckManager;
     [SerializeField] private HandUI handUI;
+    [SerializeField] private ProductionManager productionManager;
     private Card cardSelected;
     private Cell cellSelected;
     private int maxMoves;
@@ -50,12 +51,22 @@ public class CardPlacementManager : MonoBehaviour
             Debug.LogWarning("No moves left to place card.");
             return;
         }
+        if (cellSelected.IsBusy)
+        {
+            Debug.LogWarning("Cell is already occupied.");
+            return;
+        }
         CardConstruction construction = cardSelected as CardConstruction;
         if (construction == null)
         {
             return;
         }
-        Instantiate(construction.InstancePrefab, cellSelected.transform.position, Quaternion.identity);
+        GameObject placedConstruction = Instantiate(construction.InstancePrefab, cellSelected.transform.position, Quaternion.identity);
+        cellSelected.SetCurrentConstruction(placedConstruction);
+        ConstructionBehaviour constructionBehaviour = placedConstruction.GetComponent<ConstructionBehaviour>();
+        constructionBehaviour.SetCell(cellSelected);
+        constructionBehaviour.SetLevelCreator(levelCreator);
+        productionManager.RegisterConstruction(constructionBehaviour);
         deckManager.DiscardCard(cardSelected);
         handUI.RefreshHand();
         movesUsed += cardSelected.MoveCost;
