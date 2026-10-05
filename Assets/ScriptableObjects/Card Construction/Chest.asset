@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: Chest
   cardIcon: {fileID: 0}
-  moveCost: 30
+  moveCost: 15
   shopPrice: 0
   constructionType: 1
   canRotate: 0

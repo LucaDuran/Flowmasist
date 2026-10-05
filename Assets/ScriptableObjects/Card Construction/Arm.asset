@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: Arm
   cardIcon: {fileID: 0}
-  moveCost: 20
+  moveCost: 10
   shopPrice: 0
   constructionType: 3
   canRotate: 0
-  instancePrefab: {fileID: 2719004954532872108, guid: a583f21b1a207fe4fb6567afec6993b7, type: 3}
+  instancePrefab: {fileID: 5150295135786795043, guid: 694fdf2360448474faefb0bf5439da1b, type: 3}
   size: {x: 1, y: 1}

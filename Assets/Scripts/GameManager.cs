@@ -10,15 +10,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] private DeckData deckData;
     [SerializeField] private CardPlacementManager cardPlacementManager;
     [SerializeField] private HandUI handUI;
+    [SerializeField] private RoundManager roundManager;
 
     private void Start()
     {
         levelCreator.Build(currentLevel);
         deckManager.StartDeck(deckData);
         cardPlacementManager.StartLevel(currentLevel);
+        roundManager.StartRound(currentLevel);
         deckManager.DealCards();
-        handUI.RefreshHand();
-        deckManager.DiscardCards(new List<Card> { deckManager.Hand[0], deckManager.Hand[1] });
         handUI.RefreshHand();
     }
 }

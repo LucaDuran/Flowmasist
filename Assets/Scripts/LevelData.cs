@@ -13,6 +13,8 @@ public class LevelData : ScriptableObject
     public int Columns => columns;
     [SerializeField] private int maxMoves;
     public int MaxMoves => maxMoves;
+    [SerializeField] private int quota;
+    public int Quota => quota;
     [SerializeField] private List<Vector2Int> extractZone;
     public List<Vector2Int> ExtractZone => extractZone;
     [SerializeField] private List<Vector2Int> lowEnergyZone;
