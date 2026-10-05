@@ -15,14 +15,20 @@ public class ProductionManager : MonoBehaviour
     }
     private void TickAll()
     {
-        Debug.Log("Cantidad de construcciones registradas: " + activeConstructions.Count);
-        foreach (var construction in activeConstructions)
+        for (int i = activeConstructions.Count - 1; i >= 0; i--)
         {
-            construction.Tick();
+            if (activeConstructions[i] == null)
+            {
+                activeConstructions.RemoveAt(i);
+            }
+            else
+            {
+                activeConstructions[i].Tick();
+            }
         }
     }
     public void Start()
     {
-        InvokeRepeating("TickAll", 3f, 3f);
+        InvokeRepeating("TickAll", 0.5f, 0.5f);
     }
 }
