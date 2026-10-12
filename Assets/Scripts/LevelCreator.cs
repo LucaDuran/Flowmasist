@@ -24,6 +24,7 @@ public class LevelCreator : MonoBehaviour
                 Vector2Int gridPos = new Vector2Int(i, j);
                 Vector3 worldPos = cellFather.position + new Vector3(i * cellSize, 0, j * cellSize);
                 GameObject newCellObject = Instantiate(cellPrefab, worldPos, Quaternion.identity, cellFather);
+                newCellObject.name = $"Cell_{i}_{j}";
                 Cell cell = newCellObject.GetComponent<Cell>();
                 cell.Initialize(gridPos, true, true, false);
                 cell.SetCardPlacementManager(cardPlacementManager);

@@ -5,6 +5,11 @@ using UnityEngine;
 public abstract class ConstructionBehaviour : MonoBehaviour
 {
     protected Cell cell;
+    protected Vector2Int facing = new Vector2Int(1, 0);
+    public void SetFacing(Vector2Int direction)
+    {
+        facing = direction;
+    }
     public void SetCell(Cell cell)
     {
         this.cell = cell;
@@ -16,7 +21,7 @@ public abstract class ConstructionBehaviour : MonoBehaviour
     }
     protected Vector2Int GetDirectionVector() 
     {
-        return new Vector2Int(1, 0);
+        return facing;
     }
     protected Cell GetNeighbor(Vector2Int offset)
     {

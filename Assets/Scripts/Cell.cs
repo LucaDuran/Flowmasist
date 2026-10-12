@@ -57,6 +57,18 @@ public class Cell : MonoBehaviour
         }
         cardPlacementManager.OnCellSelected(this);
     }
+    private void OnMouseEnter()
+    {
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+        cardPlacementManager.OnCellHover(this);
+    }
+    private void OnMouseExit()
+    {
+        cardPlacementManager.OnCellExit(this);
+    }
 
     void Start()
     {

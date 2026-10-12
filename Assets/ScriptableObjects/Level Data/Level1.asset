@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Level1
   m_EditorClassIdentifier: 
   levelName: Level1
-  rows: 30
-  columns: 10
+  rows: 8
+  columns: 5
   maxMoves: 150
   quota: 30
   extractZone: []
