@@ -8,6 +8,8 @@ public class CardPlacementManager : MonoBehaviour
     [SerializeField] private HandUI handUI;
     [SerializeField] private ProductionManager productionManager;
     [SerializeField] private Material ghostMaterial;
+    [SerializeField] private RoundManager roundManager;
+
     private Card cardSelected;
     private Cell cellSelected;
     private int maxMoves;
@@ -21,6 +23,11 @@ public class CardPlacementManager : MonoBehaviour
     }
     public void OnCardSelected(Card card)
     {
+        if (!roundManager.IsSetup)
+        {
+            Debug.LogWarning("Cannot select card before round setup.");
+            return;
+        }
         if (deckManager.Hand.Contains(card))
         {
             cardSelected = card;
@@ -35,6 +42,16 @@ public class CardPlacementManager : MonoBehaviour
     }
     public void OnCellSelected(Cell cell)
     {
+        if (cardSelected == null)
+        {
+            Debug.LogWarning("No card selected to place.");
+            return;
+        }
+        if (!roundManager.IsSetup)
+        {
+            Debug.LogWarning("Cannot select cell before round setup.");
+            return;
+        }
         if (cell.CanBuild)
         {
             cellSelected = cell;

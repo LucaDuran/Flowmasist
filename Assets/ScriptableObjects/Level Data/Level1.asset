@@ -21,3 +21,4 @@ MonoBehaviour:
   lowEnergyZone: []
   cantBuild: []
   canRotate: 0
+  executionTicks: 60

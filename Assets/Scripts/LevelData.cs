@@ -23,4 +23,6 @@ public class LevelData : ScriptableObject
     public List<Vector2Int> CantBuild => cantBuild;
     [SerializeField] private bool canRotate;
     public bool CanRotate => canRotate;
+    [SerializeField] private int executionTicks;
+    public int ExecutionTicks => executionTicks;
 }

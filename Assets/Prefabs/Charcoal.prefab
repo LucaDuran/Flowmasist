@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e09dd96616dc41478bb107f4bceb48b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  travelTime: 0.5
+  travelTime: 0.3
 --- !u!1 &8661185818724417065
 GameObject:
   m_ObjectHideFlags: 0

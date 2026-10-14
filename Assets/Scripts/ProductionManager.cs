@@ -1,10 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ProductionManager : MonoBehaviour
 {
+    public static event Action OnProductionFinished;
     private List<ConstructionBehaviour> activeConstructions = new List<ConstructionBehaviour>();
+    private int ticksLeft;
 
     public void RegisterConstruction(ConstructionBehaviour construction)
     {
@@ -12,6 +15,11 @@ public class ProductionManager : MonoBehaviour
         {
             activeConstructions.Add(construction);
         }
+    }
+    public void StartProduction(int ticks)
+    {
+        ticksLeft = ticks;
+        InvokeRepeating("TickAll", 0.5f, 0.5f);
     }
     private void TickAll()
     {
@@ -26,9 +34,11 @@ public class ProductionManager : MonoBehaviour
                 activeConstructions[i].Tick();
             }
         }
-    }
-    public void Start()
-    {
-        InvokeRepeating("TickAll", 0.5f, 0.5f);
+        ticksLeft--;
+        if (ticksLeft <= 0)
+        {
+            CancelInvoke("TickAll");
+            OnProductionFinished?.Invoke();
+        }
     }
 }
