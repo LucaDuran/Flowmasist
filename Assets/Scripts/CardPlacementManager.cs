@@ -124,6 +124,12 @@ public class CardPlacementManager : MonoBehaviour
     {
         return Quaternion.LookRotation(new Vector3(pendingFacing.x, 0, pendingFacing.y));
     }
+    public void CancelSelection()
+    {
+        cardSelected = null;
+        cellSelected = null;
+        DestroyGhost();
+    }
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.R))

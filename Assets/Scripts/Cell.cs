@@ -11,6 +11,9 @@ public class Cell : MonoBehaviour
     private GameObject currentConstruction;
     public GameObject CurrentConstruction => currentConstruction;
     public bool IsBusy => currentConstruction != null;
+    public bool HasConveyor => currentConstruction != null && currentConstruction.GetComponent<ConveyorBelt>() != null;
+    public bool AcceptsItems => currentConstruction != null && currentConstruction.GetComponent<ConstructionBehaviour>().AcceptItems;
+
     private Vector2Int gridPosition;
     public Vector2Int GridPosition => gridPosition;
     private bool canBuild;

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ConveyorBelt : ConstructionBehaviour
 {
+    public override bool AcceptItems => true;
     public override void Tick()
     {
         if (cell.ResourceItem != null)

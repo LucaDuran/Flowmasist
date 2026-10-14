@@ -1,18 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
 
 public class DeckManager : MonoBehaviour
 {
     [SerializeField] private int maxHandSize = 8;
     [SerializeField] private int maxDiscards = 3;
-    [SerializeField] private int maxCardsPerDiscard = 5;
+    [SerializeField] private int maxCardsPerDiscard = 3;
     private int discardsUsed = 0;
     private List<Card> actualDeck = new List<Card>();
     private List<Card> hand = new List<Card>();
     public List<Card> Hand => hand;
     private List<Card> discardPile = new List<Card>();
+    public int DiscardsLeft => maxDiscards - discardsUsed;
+    public int MaxCardsPerDiscard => maxCardsPerDiscard;
     public void StartDeck(DeckData deckData)
     {
         actualDeck = new List<Card>(deckData.Cards);

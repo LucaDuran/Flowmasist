@@ -9,6 +9,7 @@ public class HandUI : MonoBehaviour
     [SerializeField] private GameObject cardUIPrefab;
     [SerializeField] private Transform handPanel;
     [SerializeField] private CardPlacementManager cardPlacementManager;
+    [SerializeField] private DiscardController discardController;
 
     public void RefreshHand()
     {
@@ -23,7 +24,7 @@ public class HandUI : MonoBehaviour
             Debug.Log("Displaying card: " + card.CardName);
             GameObject cardUIObj = Instantiate(cardUIPrefab, handPanel);
             CardUI cardUI = cardUIObj.GetComponent<CardUI>();
-            cardUI.ShowCard(card, cardPlacementManager);
+            cardUI.ShowCard(card, cardPlacementManager, discardController);
         }
         Debug.Log("Prefab is null: " + (cardUIPrefab == null));
     }

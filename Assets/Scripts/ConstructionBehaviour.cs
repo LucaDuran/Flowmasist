@@ -6,6 +6,7 @@ public abstract class ConstructionBehaviour : MonoBehaviour
 {
     protected Cell cell;
     protected Vector2Int facing = new Vector2Int(1, 0);
+    public virtual bool AcceptItems => false;
     public void SetFacing(Vector2Int direction)
     {
         facing = direction;

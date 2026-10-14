@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Chest : ConstructionBehaviour
 {
+    public override bool AcceptItems => true;
     public static event Action OnResourceCollected;
     private int collectedCount = 0;
     public int CollectedCount => collectedCount;

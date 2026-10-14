@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Arm : ConstructionBehaviour
 {
-    public override void Tick()
+   public override void Tick()
     {
         Cell source = GetNeighbor(-GetDirectionVector());
         Cell destination = GetNeighbor(GetDirectionVector());
@@ -12,7 +12,7 @@ public class Arm : ConstructionBehaviour
         {
             return;
         }
-        if (source.ResourceItem != null && destination.ResourceItem == null)
+        if (source.ResourceItem != null && destination.ResourceItem == null && destination.AcceptsItems)
         {
             destination.SetResourceItem(source.ResourceItem);
             source.ResourceItem.MoveTo(destination.transform.position);
