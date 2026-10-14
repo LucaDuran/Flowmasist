@@ -10,6 +10,10 @@ public class Chest : ConstructionBehaviour
     private int collectedCount = 0;
     public int CollectedCount => collectedCount;
 
+    public override ConstructionBehaviour GetNextConstruction()
+    {
+        return null;
+    }
     public override void Tick()
     {
         if (cell.ResourceItem != null && cell.ResourceItem.HasArrived)

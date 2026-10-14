@@ -4,61 +4,107 @@ using UnityEngine;
 
 public class LevelCreator : MonoBehaviour
 {
-    [SerializeField] private GameObject cellPrefab;
+    [SerializeField] private GameObject floorPrefab;
+    [SerializeField] private GameObject veinPrefab;
+    [SerializeField] private GameObject wallPrefab;
+    [SerializeField] private GameObject chestPrefab;
     [SerializeField] private Transform cellFather;
     [SerializeField] private float cellSize;
     [SerializeField] private CardPlacementManager cardPlacementManager;
+    [SerializeField] private ProductionManager productionManager;
     private Cell[,] grid;
     public void Build(LevelData levelData)
     {
-        GenerateGrid(levelData.Rows, levelData.Columns);
-        ApllyLevelRules(levelData);
-    }
-    private void GenerateGrid(int rows, int columns)
-    {
+        List<string> lines = ParseMap(levelData.Map);
+        if (lines.Count == 0)
+        {
+            Debug.LogError("The map is empty.");
+            return;
+        }
+        int rows = lines.Count;
+        int columns = lines[0].Length;
+        foreach(string line in lines)
+        {
+            if (line.Length != columns)
+            {
+                Debug.LogError("All map lines must have the same length.");
+                return;
+            }
+        }
         grid = new Cell[rows, columns];
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < columns; j++)
             {
-                Vector2Int gridPos = new Vector2Int(i, j);
-                Vector3 worldPos = cellFather.position + new Vector3(i * cellSize, 0, j * cellSize);
-                GameObject newCellObject = Instantiate(cellPrefab, worldPos, Quaternion.identity, cellFather);
-                newCellObject.name = $"Cell_{i}_{j}";
-                Cell cell = newCellObject.GetComponent<Cell>();
-                cell.Initialize(gridPos, true, true, false);
-                cell.SetCardPlacementManager(cardPlacementManager);
-                grid[i, j] = cell;
+                grid[i, j] = CreateCell(i, j, lines[i][j]);
             }
         }
     }
-    private void ApllyLevelRules(LevelData levelData)
+    private List<string> ParseMap(TextAsset map)
     {
-        foreach (Vector2Int pos in levelData.CantBuild)
+        List<string> lines = new List<string>();
+        foreach (string rawLine in map.text.Split('\n'))
         {
-            grid[pos.x, pos.y].SetCanBuild(false);
+            string line = rawLine.Trim();
+            if (line =="" || line.StartsWith("#"))
+            {
+                continue;
+            }
+            lines.Add(line);
         }
-        foreach (Vector2Int pos in levelData.ExtractZone)
+        return lines;
+    }
+    private Cell CreateCell(int row, int column,char symbol)
+    {
+        GameObject prefab = floorPrefab;
+        bool canBuild = true;
+        bool isExtractionZone = false;
+        switch (symbol)
         {
-            grid[pos.x, pos.y].SetIsExtractionZone(true);
+            case '.':
+                break;
+            case 'V':
+                prefab = veinPrefab;
+                isExtractionZone = true;
+                break;
+            case 'X':
+                prefab = wallPrefab;
+                canBuild = false;
+                break;
+            case 'M':
+                canBuild = false;
+                break;
+            default:
+                Debug.LogWarning($"Unknown map symbol '{symbol}' at ({row}, {column}). Defaulting to floor.");
+                break;
         }
-        foreach (Vector2Int pos in levelData.LowEnergyZone)
+        Vector3 worldPos = cellFather.position + new Vector3(row * cellSize, 0, column * cellSize);
+        GameObject cellObject = Instantiate(prefab, worldPos, Quaternion.identity, cellFather);
+        cellObject.name = $"Cell_{row}_{column}";
+        Cell cell = cellObject.GetComponent<Cell>();
+        cell.Initialize(new Vector2Int(row, column), canBuild, isExtractionZone, false);
+        cell.SetCardPlacementManager(cardPlacementManager);
+        if (symbol == 'M')
         {
-            grid[pos.x, pos.y].SetIsLowEnergyZone(true);
+            PlaceChest(cell, worldPos);
         }
+        return cell;
+    }
+    private void PlaceChest(Cell cell, Vector3 worldPos)
+    {
+        GameObject chestObject = Instantiate(chestPrefab, worldPos, Quaternion.identity, cellFather);
+        cell.SetCurrentConstruction(chestObject);
+        ConstructionBehaviour chest = chestObject.GetComponent<ConstructionBehaviour>();
+        chest.SetCell(cell);
+        chest.SetLevelCreator(this);
+        productionManager.RegisterConstruction(chest);
     }
     public Cell GetCell(int row, int column)
     {
         if (row < 0 || row >= grid.GetLength(0) || column < 0 || column >= grid.GetLength(1))
         {
-            Debug.LogWarning($"Cell position ({row}, {column}) is out of bounds.");
             return null;
         }
         return grid[row, column];
-    }
-
-    void Start()
-    {
-        
     }
 }

@@ -20,6 +20,7 @@ public class Cell : MonoBehaviour
     public bool CanBuild => canBuild;
     private bool isLowEnergyZone;
     private bool isExtractionZone;
+    public bool IsExtractionZone => isExtractionZone;
 
     public void Initialize(Vector2Int position, bool canBuild, bool isExtractionZone, bool isLowEnergyZone)
     {

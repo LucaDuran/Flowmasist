@@ -19,17 +19,16 @@ public class ProductionManager : MonoBehaviour
     public void StartProduction(int ticks)
     {
         ticksLeft = ticks;
+        activeConstructions.RemoveAll(c => c == null);
+        int maxSteps = activeConstructions.Count;
+        activeConstructions.Sort((a, b) => a.GetDepth(maxSteps).CompareTo(b.GetDepth(maxSteps)));
         InvokeRepeating("TickAll", 0.5f, 0.5f);
     }
     private void TickAll()
     {
-        for (int i = activeConstructions.Count - 1; i >= 0; i--)
+        for (int i = 0; i < activeConstructions.Count; i++)
         {
-            if (activeConstructions[i] == null)
-            {
-                activeConstructions.RemoveAt(i);
-            }
-            else
+            if (activeConstructions[i] != null)
             {
                 activeConstructions[i].Tick();
             }

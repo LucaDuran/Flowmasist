@@ -29,5 +29,29 @@ public abstract class ConstructionBehaviour : MonoBehaviour
         Vector2Int neighborPosition = cell.GridPosition + offset;
         return levelCreator.GetCell(neighborPosition.x, neighborPosition.y);
     }
+    public virtual ConstructionBehaviour GetNextConstruction()
+    {
+        Cell next = GetNeighbor(facing);
+        if (next == null || next.CurrentConstruction == null)
+        {
+            return null;
+        }
+        return next.CurrentConstruction.GetComponent<ConstructionBehaviour>();
+    }
+    public int GetDepth(int maxSteps)
+    {
+        int depth = 0;
+        ConstructionBehaviour current = this;
+        while (depth < maxSteps)
+        {
+            current = current.GetNextConstruction();
+            if (current == null)
+            {
+                break;
+            }
+            depth++;
+        }
+        return depth;
+    }
     public abstract void Tick();
 }

@@ -13,12 +13,8 @@ MonoBehaviour:
   m_Name: Level1
   m_EditorClassIdentifier: 
   levelName: Level1
-  rows: 8
-  columns: 5
+  map: {fileID: 4900000, guid: ada0972093007d344a00d4f7690921c0, type: 3}
   maxMoves: 150
   quota: 30
-  extractZone: []
-  lowEnergyZone: []
-  cantBuild: []
   canRotate: 0
   executionTicks: 60

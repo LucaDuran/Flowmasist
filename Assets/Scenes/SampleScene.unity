@@ -246,7 +246,7 @@ Transform:
   m_GameObject: {fileID: 142743767}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 0, y: 7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1206,10 +1206,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1b235d5e5e8dee4cb78af9e83b2b6d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellPrefab: {fileID: 7821000397132669529, guid: c44feea1e6096d04689aa918c867c95c, type: 3}
+  floorPrefab: {fileID: 7821000397132669529, guid: c44feea1e6096d04689aa918c867c95c, type: 3}
+  veinPrefab: {fileID: 7821000397132669529, guid: 98bf83c71e42f4244a96ca0be868b32c, type: 3}
+  wallPrefab: {fileID: 7821000397132669529, guid: 442a76260ea068348a4cd2c9bf3c1a5f, type: 3}
+  chestPrefab: {fileID: 2719004954532872108, guid: c317a4c14c5ad3046aa053dcd1d7503f, type: 3}
   cellFather: {fileID: 142743768}
   cellSize: 1.1
   cardPlacementManager: {fileID: 119471268}
+  productionManager: {fileID: 584208747}
 --- !u!4 &914658214
 Transform:
   m_ObjectHideFlags: 0
@@ -1382,7 +1386,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.47410265, g: 0.2269491, b: 0.6415094, a: 0}
+  m_BackGroundColor: {r: 0.6981132, g: 0.4818803, b: 0.25355998, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1406,8 +1410,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1431,13 +1435,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.17364816, y: 0, z: 0, w: 0.9848078}
-  m_LocalPosition: {x: 4, y: 15, z: -15}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 4, y: 15, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 20, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &996091104
 GameObject:
   m_ObjectHideFlags: 0
@@ -1608,8 +1612,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -375}
-  m_SizeDelta: {x: -800, y: -750}
+  m_AnchoredPosition: {x: -100, y: -375}
+  m_SizeDelta: {x: -600, y: -750}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1299752380
 MonoBehaviour:

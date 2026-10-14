@@ -33,7 +33,6 @@ public class CardPlacementManager : MonoBehaviour
             cardSelected = card;
             pendingFacing = new Vector2Int(1, 0);
             CreateGhost(card as CardConstruction);
-            PlaceCard();
         }
         else
         {
@@ -50,6 +49,10 @@ public class CardPlacementManager : MonoBehaviour
         if (!roundManager.IsSetup)
         {
             Debug.LogWarning("Cannot select cell before round setup.");
+            return;
+        }
+        if (cardSelected == null)
+        {
             return;
         }
         if (cell.CanBuild)
@@ -83,6 +86,11 @@ public class CardPlacementManager : MonoBehaviour
         {
             return;
         }
+        if (construction.Type == CardConstruction.ConstructionType.Extractor && !cellSelected.IsExtractionZone)
+        {
+            Debug.LogWarning("Extractor can only be placed in extraction zones.");
+            return;
+        }
         GameObject placedConstruction = Instantiate(construction.InstancePrefab, cellSelected.transform.position, FacingToRotation());
         cellSelected.SetCurrentConstruction(placedConstruction);
         ConstructionBehaviour constructionBehaviour = placedConstruction.GetComponent<ConstructionBehaviour>();
@@ -100,7 +108,7 @@ public class CardPlacementManager : MonoBehaviour
     }
     public void OnCellHover(Cell cell)
     {
-        if (ghost == null)
+        if (ghost == null || !cell.CanBuild)
         {
             return;
         }
