@@ -21,12 +21,27 @@ public class DeckManager : MonoBehaviour
     }
     public Card DrawCard()
     {
+        if (actualDeck.Count == 0)
+        {
+            ReshuffleDiscardPile();
+        }
+        if (actualDeck.Count == 0)
+        {
+            Debug.Log("No cards left to draw.");
+            return null;
+        }
         int index = Random.Range(0, actualDeck.Count);
         Card cardStole = actualDeck[index];
         hand.Add(cardStole);
         actualDeck.RemoveAt(index);
         Debug.Log(cardStole);
         return cardStole;
+    }
+    private void ReshuffleDiscardPile()
+    {
+        actualDeck.AddRange(discardPile);
+        discardPile.Clear();
+        Debug.Log("Reshuffled discard pile into the deck.");
     }
     public void DiscardCards(List<Card> cardsToDiscard)
     {
@@ -75,13 +90,9 @@ public class DeckManager : MonoBehaviour
         int cardsNeeded = maxHandSize - hand.Count;
         for (int i = 0; i < cardsNeeded; i++)
         {
-            if (actualDeck.Count > 0)
+            if(DrawCard() == null)
             {
-                DrawCard();
-            }
-            else
-            {
-                Debug.Log("No more cards in the deck to draw.");
+                Debug.Log("No more cards to draw.");
                 break;
             }
         }
