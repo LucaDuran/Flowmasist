@@ -21,6 +21,8 @@ public class Cell : MonoBehaviour
     private bool isLowEnergyZone;
     private bool isExtractionZone;
     public bool IsExtractionZone => isExtractionZone;
+    private int stock = -1;
+    public bool HasStock => stock != 0;
 
     public void Initialize(Vector2Int position, bool canBuild, bool isExtractionZone, bool isLowEnergyZone)
     {
@@ -77,5 +79,21 @@ public class Cell : MonoBehaviour
     void Start()
     {
         
+    }
+    public void SetStock(int stock)
+    {
+        this.stock = stock;
+    }
+    public bool TryTakeStock()
+    {
+        if (stock == 0)
+        {
+            return false;
+        }
+        if (stock > 0)
+        {
+            stock--;
+        }
+        return true;
     }
 }
