@@ -18,7 +18,7 @@ public class Extractor : ConstructionBehaviour
                 cell.SetResourceItem(null);
             }
         }
-        if (cell.ResourceItem == null)
+        if (cell.ResourceItem == null && cell.TryTakeStock())
         {
             GameObject resourceItem = Instantiate(resourceItemPrefab, cell.transform.position, Quaternion.identity);
             cell.SetResourceItem(resourceItem.GetComponent<ResourceItem>());
