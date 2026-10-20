@@ -12,6 +12,7 @@ public class LevelCreator : MonoBehaviour
     [SerializeField] private float cellSize;
     [SerializeField] private CardPlacementManager cardPlacementManager;
     [SerializeField] private ProductionManager productionManager;
+    [SerializeField] private int stockPerDigit = 5;
     private Cell[,] grid;
     public void Build(LevelData levelData)
     {
@@ -59,8 +60,15 @@ public class LevelCreator : MonoBehaviour
         GameObject prefab = floorPrefab;
         bool canBuild = true;
         bool isExtractionZone = false;
-        switch (symbol)
+        int cellStock = -1;
+        if (char.IsDigit(symbol))
         {
+            prefab = veinPrefab;
+            isExtractionZone = true;
+            cellStock = (symbol - '0') * stockPerDigit;
+        }
+        switch (symbol)
+        {  
             case '.':
                 break;
             case 'V':
@@ -84,6 +92,10 @@ public class LevelCreator : MonoBehaviour
         Cell cell = cellObject.GetComponent<Cell>();
         cell.Initialize(new Vector2Int(row, column), canBuild, isExtractionZone, false);
         cell.SetCardPlacementManager(cardPlacementManager);
+        if (cellStock > 0)
+        {
+            cell.SetStock(cellStock);
+        }
         if (symbol == 'M')
         {
             PlaceChest(cell, worldPos);
