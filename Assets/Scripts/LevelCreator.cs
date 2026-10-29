@@ -5,6 +5,8 @@ using UnityEngine;
 public class LevelCreator : MonoBehaviour
 {
     [SerializeField] private GameObject floorPrefab;
+    [SerializeField] private GameObject discountPrefab;
+    [SerializeField] private GameObject subchargePrefab;
     [SerializeField] private GameObject veinPrefab;
     [SerializeField] private GameObject wallPrefab;
     [SerializeField] private GameObject chestPrefab;
@@ -70,6 +72,12 @@ public class LevelCreator : MonoBehaviour
         switch (symbol)
         {  
             case '.':
+                break;
+            case '+':
+                prefab = subchargePrefab;
+                break;
+            case '-':
+                prefab = discountPrefab;
                 break;
             case 'V':
                 prefab = veinPrefab;

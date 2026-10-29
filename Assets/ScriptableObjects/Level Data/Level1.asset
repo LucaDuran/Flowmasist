@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Level1
   m_EditorClassIdentifier: 
   levelName: Level1
-  map: {fileID: 4900000, guid: ada0972093007d344a00d4f7690921c0, type: 3}
-  maxMoves: 150
-  quota: 30
+  map: {fileID: 4900000, guid: fe50f9ed465a27447926d4a76fb6a7f6, type: 3}
+  maxMoves: 55
+  quota: 20
   canRotate: 0
-  executionTicks: 60
+  executionTicks: 30

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +21,7 @@ public class CardPlacementManager : MonoBehaviour
     {
         movesUsed = 0;
         maxMoves = levelData.MaxMoves;
+        NotifyEnergy();
     }
     public void OnCardSelected(Card card)
     {
@@ -51,10 +53,6 @@ public class CardPlacementManager : MonoBehaviour
             Debug.LogWarning("Cannot select cell before round setup.");
             return;
         }
-        if (cardSelected == null)
-        {
-            return;
-        }
         if (cell.CanBuild)
         {
             cellSelected = cell;
@@ -71,7 +69,9 @@ public class CardPlacementManager : MonoBehaviour
         {
             return;
         }
-        if (movesUsed + cardSelected.MoveCost > maxMoves)
+        int energyCost = cellSelected.GetEnergyCost(cardSelected.MoveCost);
+
+        if (movesUsed + energyCost > maxMoves)
         {
             Debug.LogWarning("No moves left to place card.");
             return;
@@ -101,7 +101,8 @@ public class CardPlacementManager : MonoBehaviour
         deckManager.DiscardCard(cardSelected);
         deckManager.DealCards();
         handUI.RefreshHand();
-        movesUsed += cardSelected.MoveCost;
+        movesUsed += energyCost;
+        NotifyEnergy();
         cardSelected = null;
         DestroyGhost();
         cellSelected = null;
@@ -167,4 +168,10 @@ public class CardPlacementManager : MonoBehaviour
             Debug.Log("Facing rotated to: " + pendingFacing);
         }
     }
+    public static event Action<int, int> OnEnergyChange;
+    private void NotifyEnergy()
+    {
+        OnEnergyChange?.Invoke(movesUsed, maxMoves);
+    }
+
 }

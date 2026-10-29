@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class Cell : MonoBehaviour
 {
+    [SerializeField] private TextMeshPro textVein;
     private CardPlacementManager cardPlacementManager;
     private ResourceItem resourceItem;
     public ResourceItem ResourceItem => resourceItem;
@@ -23,7 +25,7 @@ public class Cell : MonoBehaviour
     public bool IsExtractionZone => isExtractionZone;
     private int stock = -1;
     public bool HasStock => stock != 0;
-
+    [SerializeField] private int energyModifier = 0;
     public void Initialize(Vector2Int position, bool canBuild, bool isExtractionZone, bool isLowEnergyZone)
     {
         gridPosition = position;
@@ -83,6 +85,7 @@ public class Cell : MonoBehaviour
     public void SetStock(int stock)
     {
         this.stock = stock;
+        UpdateStockLabel();
     }
     public bool TryTakeStock()
     {
@@ -93,7 +96,34 @@ public class Cell : MonoBehaviour
         if (stock > 0)
         {
             stock--;
+            UpdateStockLabel();
         }
         return true;
+    }
+    private void UpdateStockLabel()
+    {
+        if (textVein == null)
+        {
+            return;
+        }
+        textVein.color = Color.white;
+        if (stock == -1)
+        {
+            textVein.text = "";
+            return;
+        }
+        if (stock == 0)
+        {
+            textVein.color = Color.red;
+        }
+        textVein.text = stock.ToString();
+    }
+    public void SetEnergyModifier(int energyModifier)
+    {
+        this.energyModifier = energyModifier;
+    }
+    public int GetEnergyCost(int baseCost)
+    {
+        return Mathf.Max(0, baseCost + energyModifier);
     }
 }
