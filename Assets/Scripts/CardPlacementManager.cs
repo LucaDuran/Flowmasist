@@ -104,6 +104,7 @@ public class CardPlacementManager : MonoBehaviour
         movesUsed += energyCost;
         NotifyEnergy();
         cardSelected = null;
+        NotifyCostPreview(-1);
         DestroyGhost();
         cellSelected = null;
     }
@@ -113,11 +114,13 @@ public class CardPlacementManager : MonoBehaviour
         {
             return;
         }
+        NotifyCostPreview(cell.GetEnergyCost(cardSelected.MoveCost));
         ghost.transform.position = cell.transform.position;
         ghost.SetActive(true);
     }
     public void OnCellExit(Cell cell)
     {
+        NotifyCostPreview(-1);
         if (ghost != null)
         {
             ghost.SetActive(false);
@@ -154,6 +157,7 @@ public class CardPlacementManager : MonoBehaviour
     {
         cardSelected = null;
         cellSelected = null;
+        NotifyCostPreview(-1);
         DestroyGhost();
     }
     private void Update()
@@ -165,7 +169,6 @@ public class CardPlacementManager : MonoBehaviour
             {
                 ghost.transform.rotation = FacingToRotation();
             }
-            Debug.Log("Facing rotated to: " + pendingFacing);
         }
     }
     public static event Action<int, int> OnEnergyChange;
@@ -173,5 +176,9 @@ public class CardPlacementManager : MonoBehaviour
     {
         OnEnergyChange?.Invoke(movesUsed, maxMoves);
     }
-
+    public static event Action<int> OnCostPreview;
+    private void NotifyCostPreview(int cost)
+    {
+        OnCostPreview?.Invoke(cost);
+    }
 }
