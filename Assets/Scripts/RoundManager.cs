@@ -70,6 +70,10 @@ public class RoundManager : MonoBehaviour
     {
         phase = RoundPhase.Finished;
         bool won = delivered >= quota;
+        if (won)
+        {
+            GameSession.CompleteCurrentLevel();
+        }
         OnRoundFinished?.Invoke(won, delivered, quota);
     }
     private void UpdateText()

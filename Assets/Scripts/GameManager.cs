@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private LevelList levelList;
+    [SerializeField] private LevelData debugLevel;
     [SerializeField] private LevelCreator levelCreator;
-    [SerializeField] private LevelData currentLevel;
     [SerializeField] private DeckManager deckManager;
     [SerializeField] private DeckData deckData;
     [SerializeField] private CardPlacementManager cardPlacementManager;
@@ -14,6 +15,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        LevelData currentLevel = debugLevel != null ? debugLevel : levelList.GetLevel(GameSession.CurrentIndex);
         levelCreator.Build(currentLevel);
         deckManager.StartDeck(deckData);
         cardPlacementManager.StartLevel(currentLevel);

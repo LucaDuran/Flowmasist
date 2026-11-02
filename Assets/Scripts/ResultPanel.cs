@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ResultPanel : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class ResultPanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI deliveredText;
     [SerializeField] private TextMeshProUGUI energyText;
+    [SerializeField] private GameObject nextButton;
+    [SerializeField] private LevelList levelList;
     private int usedEnergy;
     private int maxEnergy;
 
@@ -21,6 +24,11 @@ public class ResultPanel : MonoBehaviour
     {
         RoundManager.OnRoundFinished -= ShowResult;
         CardPlacementManager.OnEnergyChange -= SaveEnergy;
+    }
+    public void OnNextButtonPressed()
+    {
+        GameSession.SelectLevel(GameSession.CurrentIndex + 1);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     private void Start()
     {
@@ -36,6 +44,8 @@ public class ResultPanel : MonoBehaviour
         titleText.text = won ? "Level completed!" : "Level failed";
         deliveredText.text = "Delivered: " + delivered + " / " + quota;
         energyText.text = "Energy: " + usedEnergy + " / " + maxEnergy;
+        bool hasNext = GameSession.CurrentIndex + 1 < levelList.Count;
+        nextButton.SetActive(won && hasNext);
         panel.SetActive(true);
     }
 }
