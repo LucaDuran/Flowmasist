@@ -10,6 +10,9 @@ public class CardPlacementManager : MonoBehaviour
     [SerializeField] private ProductionManager productionManager;
     [SerializeField] private Material ghostMaterial;
     [SerializeField] private RoundManager roundManager;
+    [SerializeField] private Color rejectColor = new Color(1f, 0.2f, 0.2f, 0.6f);
+    [SerializeField] private float ghostRejectDuration = 0.3f;
+    private float ghostRejectTime;
 
     private Card cardSelected;
     private Cell cellSelected;
@@ -17,13 +20,15 @@ public class CardPlacementManager : MonoBehaviour
     private int movesUsed = 0;
     private Vector2Int pendingFacing = new Vector2Int(1, 0);
     private GameObject ghost;
+    private CardUI selectedCardUI;
+
     public void StartLevel(LevelData levelData)
     {
         movesUsed = 0;
         maxMoves = levelData.MaxMoves;
         NotifyEnergy();
     }
-    public void OnCardSelected(Card card)
+    public void OnCardSelected(Card card, CardUI cardUI)
     {
         if (!roundManager.IsSetup)
         {
@@ -33,6 +38,7 @@ public class CardPlacementManager : MonoBehaviour
         if (deckManager.Hand.Contains(card))
         {
             cardSelected = card;
+            selectedCardUI = cardUI;
             pendingFacing = new Vector2Int(1, 0);
             CreateGhost(card as CardConstruction);
         }
@@ -74,21 +80,25 @@ public class CardPlacementManager : MonoBehaviour
         if (movesUsed + energyCost > maxMoves)
         {
             Debug.LogWarning("No moves left to place card.");
+            RejectPlacement();
             return;
         }
         if (cellSelected.IsBusy)
         {
             Debug.LogWarning("Cell is already occupied.");
+            RejectPlacement();
             return;
         }
         CardConstruction construction = cardSelected as CardConstruction;
         if (construction == null)
         {
+            RejectPlacement();
             return;
         }
         if (construction.Type == CardConstruction.ConstructionType.Extractor && !cellSelected.IsExtractionZone)
         {
             Debug.LogWarning("Extractor can only be placed in extraction zones.");
+            RejectPlacement();
             return;
         }
         GameObject placedConstruction = Instantiate(construction.InstancePrefab, cellSelected.transform.position, FacingToRotation());
@@ -103,7 +113,7 @@ public class CardPlacementManager : MonoBehaviour
         handUI.RefreshHand();
         movesUsed += energyCost;
         NotifyEnergy();
-        cardSelected = null;
+        selectedCardUI = null;
         NotifyCostPreview(-1);
         DestroyGhost();
         cellSelected = null;
@@ -149,6 +159,25 @@ public class CardPlacementManager : MonoBehaviour
             ghost = null;
         }
     }
+    private void RejectPlacement()
+    {
+        if (selectedCardUI != null)
+        {
+            ghostRejectTime = ghostRejectDuration;
+            selectedCardUI.Shake();
+        }
+    }
+    private void SetGhostColor(Color color)
+    {
+        if (ghost == null)
+        {
+            return;
+        }
+        foreach (Renderer rend in ghost.GetComponentsInChildren<Renderer>())
+        {
+            rend.material.color = color;
+        }
+    }
     private Quaternion FacingToRotation()
     {
         return Quaternion.LookRotation(new Vector3(pendingFacing.x, 0, pendingFacing.y));
@@ -169,6 +198,12 @@ public class CardPlacementManager : MonoBehaviour
             {
                 ghost.transform.rotation = FacingToRotation();
             }
+        }
+        if (ghostRejectTime > 0f)
+        {
+            ghostRejectTime -= Time.deltaTime;
+            float t = Mathf.Max(ghostRejectTime, 0f) / ghostRejectDuration;
+            SetGhostColor(Color.Lerp(ghostMaterial.color, rejectColor, t));
         }
     }
     public static event Action<int, int> OnEnergyChange;

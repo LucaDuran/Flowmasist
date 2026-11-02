@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Arm
   m_EditorClassIdentifier: 
   cardName: Arm
-  cardIcon: {fileID: 0}
+  cardIcon: {fileID: 21300000, guid: 240eb325ce4527944a9c31c7182fd3ef, type: 3}
   moveCost: 10
   shopPrice: 0
   constructionType: 3

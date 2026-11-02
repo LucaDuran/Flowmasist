@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,17 +16,16 @@ public enum RoundPhase
 public class RoundManager : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI quotaText;
-    [SerializeField] private TextMeshProUGUI resultText;
     [SerializeField] private ProductionManager productionManager;
     [SerializeField] private CardPlacementManager cardPlacementManager;
     [SerializeField] private Button executeButton;
     [SerializeField] private Button discardButton;
-    [SerializeField] private Button retryButton;
     private int quota;
     private int delivered;
     private int executionTicks;
     private RoundPhase phase;
     public bool IsSetup => phase == RoundPhase.Setup;
+    public static event Action<bool, int, int> OnRoundFinished;
 
     private void OnEnable()
     {
@@ -43,8 +43,6 @@ public class RoundManager : MonoBehaviour
         executionTicks = levelData.ExecutionTicks;
         delivered = 0;
         phase = RoundPhase.Setup;
-        resultText.text = "";
-        retryButton.gameObject.SetActive(false);
         UpdateText();
     }
     public void OnExecuteButtonPressed()
@@ -71,11 +69,11 @@ public class RoundManager : MonoBehaviour
     private void HandleProductionFinished()
     {
         phase = RoundPhase.Finished;
-        resultText.text = delivered >= quota ? "¡Has entregado todos los recursos!" : "No has entregado todos los recursos.";
-        retryButton.gameObject.SetActive(true);
+        bool won = delivered >= quota;
+        OnRoundFinished?.Invoke(won, delivered, quota);
     }
     private void UpdateText()
     {
-        quotaText.text = "Recursos: " + delivered + "/" + quota;
+        quotaText.text = "Resources: " + delivered + "/" + quota;
     }
 }
