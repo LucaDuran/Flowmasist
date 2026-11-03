@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Level 1
   m_EditorClassIdentifier: 
   levelName: Level 1
-  map: {fileID: 4900000, guid: ada0972093007d344a00d4f7690921c0, type: 3}
+  map: {fileID: 4900000, guid: 04dae5cdc08fb1042bc9da9e1de7d46f, type: 3}
+  deck: {fileID: 11400000, guid: 2fb833cfc7b4d22499d5d67c13b17e33, type: 2}
   energy: 50
-  quota: 10
+  quota: 20
   canRotate: 0
   executionTicks: 30

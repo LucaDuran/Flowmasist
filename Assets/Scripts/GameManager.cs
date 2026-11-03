@@ -12,11 +12,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CardPlacementManager cardPlacementManager;
     [SerializeField] private HandUI handUI;
     [SerializeField] private RoundManager roundManager;
+    [SerializeField] private CameraRig cameraRig;
 
     private void Start()
     {
         LevelData currentLevel = debugLevel != null ? debugLevel : levelList.GetLevel(GameSession.CurrentIndex);
         levelCreator.Build(currentLevel);
+        cameraRig.Frame(levelCreator.Center, levelCreator.Size);
         DeckData levelDeck = currentLevel.Deck != null ? currentLevel.Deck : deckData;
         deckManager.StartDeck(levelDeck);
         cardPlacementManager.StartLevel(currentLevel);

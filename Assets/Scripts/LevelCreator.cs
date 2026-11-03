@@ -15,6 +15,8 @@ public class LevelCreator : MonoBehaviour
     [SerializeField] private CardPlacementManager cardPlacementManager;
     [SerializeField] private ProductionManager productionManager;
     [SerializeField] private int stockPerDigit = 5;
+    public Vector3 Center { get; private set; }
+    public Vector2 Size { get; private set; }
     private Cell[,] grid;
     public void Build(LevelData levelData)
     {
@@ -42,6 +44,10 @@ public class LevelCreator : MonoBehaviour
                 grid[i, j] = CreateCell(i, j, lines[i][j]);
             }
         }
+        float width = (rows -1) * cellSize;
+        float depth = (columns - 1) * cellSize;
+        Center = cellFather.position + new Vector3(width / 2, 0, depth / 2);
+        Size = new Vector2(width + cellSize, depth + cellSize);
     }
     private List<string> ParseMap(TextAsset map)
     {
