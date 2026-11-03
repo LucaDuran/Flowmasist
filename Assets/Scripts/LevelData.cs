@@ -9,8 +9,10 @@ public class LevelData : ScriptableObject
     public string LevelName => levelName;
     [SerializeField] private TextAsset map;
     public TextAsset Map => map;
-    [SerializeField] private int maxMoves;
-    public int MaxMoves => maxMoves;
+    [SerializeField] private DeckData deck;
+    public DeckData Deck => deck;
+    [SerializeField] private int energy;
+    public int Energy => energy;
     [SerializeField] private int quota;
     public int Quota => quota;
     [SerializeField] private bool canRotate;

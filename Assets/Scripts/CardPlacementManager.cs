@@ -25,7 +25,7 @@ public class CardPlacementManager : MonoBehaviour
     public void StartLevel(LevelData levelData)
     {
         movesUsed = 0;
-        maxMoves = levelData.MaxMoves;
+        maxMoves = levelData.Energy;
         NotifyEnergy();
     }
     public void OnCardSelected(Card card, CardUI cardUI)

@@ -17,7 +17,8 @@ public class GameManager : MonoBehaviour
     {
         LevelData currentLevel = debugLevel != null ? debugLevel : levelList.GetLevel(GameSession.CurrentIndex);
         levelCreator.Build(currentLevel);
-        deckManager.StartDeck(deckData);
+        DeckData levelDeck = currentLevel.Deck != null ? currentLevel.Deck : deckData;
+        deckManager.StartDeck(levelDeck);
         cardPlacementManager.StartLevel(currentLevel);
         roundManager.StartRound(currentLevel);
         deckManager.DealCards();
