@@ -9,7 +9,7 @@ public class CameraRig : MonoBehaviour
     private Camera cam;
     private Vector3[] corners = new Vector3[4];
     private Vector3 levelCenter;
-    private Vector3 levelSize;
+    private Vector2 levelSize;
     private bool hasLevel;
     private Rect lastArea;
     private Vector2Int lastScreen;
@@ -56,7 +56,7 @@ public class CameraRig : MonoBehaviour
         float areaCenterX = area.center.x / cam.pixelWidth;
         float areaCenterY = area.center.y / cam.pixelHeight;
         float neededHeight = (levelSize.y + padding * 2f) / (2f * areaHeight);
-        float neededWidth = (levelSize.x + padding * 2f) / (2f * areaWidth);
+        float neededWidth = (levelSize.x + padding * 2f) / (2f * cam.aspect * areaWidth);
         cam.orthographicSize = Mathf.Max(neededHeight, neededWidth);
         float offsetX = (areaCenterX - 0.5f) * 2f *cam.orthographicSize * cam.aspect;
         float offsetY = (areaCenterY - 0.5f) * 2f * cam.orthographicSize;
