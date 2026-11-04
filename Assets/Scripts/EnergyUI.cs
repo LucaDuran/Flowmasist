@@ -7,7 +7,6 @@ using TMPro;
 public class EnergyUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI energyText;
-    [SerializeField] private TextMeshProUGUI costText;
     [SerializeField] private Image pipPrefab;
     [SerializeField] private Transform pipContainer;
     [SerializeField] private int energyPerPip = 5;
@@ -38,27 +37,13 @@ public class EnergyUI : MonoBehaviour
             BuildPips(max);
         }
         RefreshPips();
-        energyText.text = "Energy: " + used + " / " + max;
+        RefreshText();
     }
     private void ShowCost(int cost)
     {
         previewCost = cost;
-        if (cost == -1)
-        {
-            costText.text = "";
-            RefreshPips();
-            return;
-        }
-        costText.text = "(+" + cost + ")";
-        if(usedEnergy + cost > maxEnergy)
-        {
-            costText.color = Color.red;
-        }
-        else
-        {
-            costText.color = Color.white;
-        }
         RefreshPips();
+        RefreshText();
     }
     private void BuildPips(int max)
     {
@@ -95,5 +80,15 @@ public class EnergyUI : MonoBehaviour
                 pips[i].color = pipFullColor;
             }
         }
+    }
+    private void RefreshText()
+    {
+        string text = (maxEnergy - usedEnergy) + " <size=70%>/" + maxEnergy + "</size>";
+        if (previewCost >= 0)
+        {
+            Color color = usedEnergy + previewCost > maxEnergy ? pipOverColor : pipPreviewColor;
+            text += " <color=#" + ColorUtility.ToHtmlStringRGB(color) + ">(-" + previewCost + ")</color>";
+        }
+        energyText.text = text;
     }
 }
