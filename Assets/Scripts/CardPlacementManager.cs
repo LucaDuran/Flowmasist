@@ -37,8 +37,18 @@ public class CardPlacementManager : MonoBehaviour
         }
         if (deckManager.Hand.Contains(card))
         {
+            if (selectedCardUI == cardUI)
+            {
+                CancelSelection();
+                return;
+            }
+            if (selectedCardUI != null)
+            {
+                selectedCardUI.SetSelected(false);
+            }
             cardSelected = card;
             selectedCardUI = cardUI;
+            cardUI.SetSelected(true);
             pendingFacing = new Vector2Int(1, 0);
             CreateGhost(card as CardConstruction);
         }
@@ -114,6 +124,7 @@ public class CardPlacementManager : MonoBehaviour
         movesUsed += energyCost;
         NotifyEnergy();
         selectedCardUI = null;
+        cardSelected = null;
         NotifyCostPreview(-1);
         DestroyGhost();
         cellSelected = null;
@@ -184,6 +195,11 @@ public class CardPlacementManager : MonoBehaviour
     }
     public void CancelSelection()
     {
+        if(selectedCardUI != null)
+        {
+            selectedCardUI.SetSelected(false);
+            selectedCardUI = null;
+        }
         cardSelected = null;
         cellSelected = null;
         NotifyCostPreview(-1);

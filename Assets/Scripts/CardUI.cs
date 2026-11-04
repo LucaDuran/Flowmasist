@@ -10,13 +10,15 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
 {
     [SerializeField] private TextMeshProUGUI cardMoveCostText;
     [SerializeField] private Image cardIconImage;
-    [SerializeField] private Image backgroundImage;
     [SerializeField] private float shakeDuration = 0.25f;
     [SerializeField] private float shakeAmount = 12f;
     [SerializeField] private RectTransform visual;
     [SerializeField]private float hoverLift = 20f;
     [SerializeField] private float hoverScale = 1.1f;
     [SerializeField] private float hoverSpeed = 5f;
+    [SerializeField] private float selectedLift = 45f;
+    private bool isSelected;
+    private float selectedAmount;
     private bool isHovered;
     private float hoverAmount;
     private float shakeTime;
@@ -36,7 +38,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     }
     public void SetSelected(bool selected)
     {
-        backgroundImage.color = selected ? Color.red : Color.white;
+        isSelected = selected;
     }
     public void OnPointerClick(PointerEventData eventData) 
     {
@@ -74,9 +76,11 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
             float progress = Mathf.Max(shakeTime, 0f) / shakeDuration;
             shakeOffset = Mathf.Sin(progress * 40f) * shakeAmount * progress;
         }
-        float target = isHovered ? 1f : 0f;
-        hoverAmount = Mathf.Lerp(hoverAmount, target, 1f - Mathf.Exp(-hoverSpeed * Time.deltaTime));
-        visual.anchoredPosition = visualBase + new Vector2(shakeOffset, hoverLift * hoverAmount);
-        visual.localScale = Vector3.one * Mathf.Lerp(1f, hoverScale, hoverAmount);
+        float smoothing = 1f - Mathf.Exp(-hoverSpeed * Time.deltaTime);
+        hoverAmount = Mathf.Lerp(hoverAmount, isHovered ? 1f : 0f, smoothing);
+        selectedAmount = Mathf.Lerp(selectedAmount, isSelected ? 1f : 0f, smoothing);
+        float lift = hoverLift * hoverAmount + selectedLift * selectedAmount;
+        visual.anchoredPosition = visualBase + new Vector2(shakeOffset, lift);
+        visual.localScale = Vector3.one * Mathf.Lerp(1f, hoverScale, Mathf.Max(hoverAmount, selectedAmount));
     }
 }

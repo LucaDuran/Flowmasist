@@ -57,17 +57,21 @@ public class DiscardController : MonoBehaviour
             selectedCards.Add(cardUI);
             cardUI.SetSelected(true);
         }
+        else
+        {
+            cardUI.Shake();
+        }
         UpdateButtonText();
     }   
     private void UpdateButtonText()
     {
         if (isDiscarding)
         {
-            discardText.text = "Confirmar (" + selectedCards.Count + "/" + deckManager.MaxCardsPerDiscard + ")";
+            discardText.text = "Confirm (" + selectedCards.Count + "/" + deckManager.MaxCardsPerDiscard + ")";
         }
         else
         {
-            discardText.text = "Descartar (" + deckManager.DiscardsLeft + ")";
+            discardText.text = "Discard (" + deckManager.DiscardsLeft + ")";
         }
     }
 }
