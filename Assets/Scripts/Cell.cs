@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 public class Cell : MonoBehaviour
 {
     [SerializeField] private TextMeshPro textVein;
+    [SerializeField] private int energyModifier = 0;
     private CardPlacementManager cardPlacementManager;
     private ResourceItem resourceItem;
     public ResourceItem ResourceItem => resourceItem;
@@ -25,7 +26,7 @@ public class Cell : MonoBehaviour
     public bool IsExtractionZone => isExtractionZone;
     private int stock = -1;
     public bool HasStock => stock != 0;
-    [SerializeField] private int energyModifier = 0;
+    public int Stock => stock;
     public void Initialize(Vector2Int position, bool canBuild, bool isExtractionZone, bool isLowEnergyZone)
     {
         gridPosition = position;

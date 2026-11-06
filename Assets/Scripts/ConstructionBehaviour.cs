@@ -7,6 +7,8 @@ public abstract class ConstructionBehaviour : MonoBehaviour
     protected Cell cell;
     protected Vector2Int facing = new Vector2Int(1, 0);
     public virtual bool AcceptItems => false;
+    public bool HasItem => cell != null && cell.ResourceItem != null;
+    public virtual void StopProduction() { }
     public void SetFacing(Vector2Int direction)
     {
         facing = direction;
@@ -29,14 +31,22 @@ public abstract class ConstructionBehaviour : MonoBehaviour
         Vector2Int neighborPosition = cell.GridPosition + offset;
         return levelCreator.GetCell(neighborPosition.x, neighborPosition.y);
     }
-    public virtual ConstructionBehaviour GetNextConstruction()
+    protected ConstructionBehaviour GetConstructionAt(Vector2Int offset)
     {
-        Cell next = GetNeighbor(facing);
-        if (next == null || next.CurrentConstruction == null)
+        Cell neighbor = GetNeighbor(offset);
+        if (neighbor == null || neighbor.CurrentConstruction == null)
         {
             return null;
         }
-        return next.CurrentConstruction.GetComponent<ConstructionBehaviour>();
+        return neighbor.CurrentConstruction.GetComponent<ConstructionBehaviour>();
+    }
+    public virtual ConstructionBehaviour GetNextConstruction()
+    {
+        return GetConstructionAt(facing);
+    }
+    public ConstructionBehaviour GetPreviousConstruction()
+    {
+        return GetConstructionAt(-facing);
     }
     public int GetDepth(int maxSteps)
     {

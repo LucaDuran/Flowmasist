@@ -30,11 +30,13 @@ public class RoundManager : MonoBehaviour
     private void OnEnable()
     {
         Chest.OnResourceCollected += HandleResourceCollected;
+        ProductionManager.OnTickProcessed += CheckQuotaReachable;
         ProductionManager.OnProductionFinished += HandleProductionFinished;
     }
     private void OnDisable()
     {
         Chest.OnResourceCollected -= HandleResourceCollected;
+        ProductionManager.OnTickProcessed -= CheckQuotaReachable;
         ProductionManager.OnProductionFinished -= HandleProductionFinished;
     }
     public void StartRound(LevelData levelData)
@@ -75,6 +77,17 @@ public class RoundManager : MonoBehaviour
             GameSession.CompleteCurrentLevel();
         }
         OnRoundFinished?.Invoke(won, delivered, quota);
+    }
+    private void CheckQuotaReachable()
+    {
+        if (phase != RoundPhase.Executing)
+        {
+            return;
+        }
+        if (delivered + productionManager.RemainingPotential() < quota)
+        {
+            productionManager.FinishProduction();
+        }
     }
     private void UpdateText()
     {

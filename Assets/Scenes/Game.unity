@@ -819,6 +819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eac2d8efe7710fb4aa37fe520b3cd3eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxDrainTicks: 20
 --- !u!4 &584208748
 Transform:
   m_ObjectHideFlags: 0
@@ -850,7 +851,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &622388477
 RectTransform:
   m_ObjectHideFlags: 0

@@ -5,6 +5,7 @@ using UnityEngine;
 public class Extractor : ConstructionBehaviour
 {
     [SerializeField] private GameObject resourceItemPrefab;
+    private bool canExtract = true;
     public override void Tick()
     {
         if (cell.ResourceItem != null)
@@ -18,10 +19,23 @@ public class Extractor : ConstructionBehaviour
                 cell.SetResourceItem(null);
             }
         }
-        if (cell.ResourceItem == null && cell.TryTakeStock())
+        if (cell.ResourceItem == null && canExtract && cell.TryTakeStock())
         {
             GameObject resourceItem = Instantiate(resourceItemPrefab, cell.transform.position, Quaternion.identity);
             cell.SetResourceItem(resourceItem.GetComponent<ResourceItem>());
         }
+    }
+    public override void StopProduction()
+    {
+        canExtract = false;
+    }
+    public int GetPotential(int ticksLeft)
+    {
+        if(!canExtract)
+        {
+            return 0;
+        }
+        int stock = cell.Stock;
+        return stock < 0 ? ticksLeft : Mathf.Min(stock, ticksLeft);
     }
 }               
