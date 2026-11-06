@@ -221,6 +221,10 @@ public class CardPlacementManager : MonoBehaviour
             float t = Mathf.Max(ghostRejectTime, 0f) / ghostRejectDuration;
             SetGhostColor(Color.Lerp(ghostMaterial.color, rejectColor, t));
         }
+        if (Input.GetMouseButtonDown(1))
+        {
+            CancelSelection();
+        }
     }
     public static event Action<int, int> OnEnergyChange;
     private void NotifyEnergy()
