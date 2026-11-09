@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class Cell : MonoBehaviour
 {
@@ -58,27 +57,6 @@ public class Cell : MonoBehaviour
     {
         resourceItem = resource;
     }
-    public void OnMouseDown()
-    {
-        if (EventSystem.current.IsPointerOverGameObject())
-        {
-            return;
-        }
-        cardPlacementManager.OnCellSelected(this);
-    }
-    private void OnMouseEnter()
-    {
-        if (EventSystem.current.IsPointerOverGameObject())
-        {
-            return;
-        }
-        cardPlacementManager.OnCellHover(this);
-    }
-    private void OnMouseExit()
-    {
-        cardPlacementManager.OnCellExit(this);
-    }
-
     void Start()
     {
         

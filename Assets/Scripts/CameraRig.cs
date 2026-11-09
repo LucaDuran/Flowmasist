@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CameraRig : MonoBehaviour
@@ -86,8 +84,8 @@ public class CameraRig : MonoBehaviour
             extentX = Mathf.Max(extentX, Mathf.Abs(Vector3.Dot(corner, transform.right)));
             extentY = Mathf.Max(extentY, Mathf.Abs(Vector3.Dot(corner, transform.up)));
         }
-        float neededHeight = (extentY + padding * 2f) / (2f * areaHeight);
-        float neededWidth = (extentX + padding * 2f) / (2f * cam.aspect * areaWidth);
+        float neededHeight = extentY + padding / areaHeight;
+        float neededWidth = extentX + padding / cam.aspect * areaWidth;
         cam.orthographicSize = Mathf.Max(neededHeight, neededWidth);
         float offsetX = (areaCenterX - 0.5f) * 2f *cam.orthographicSize * cam.aspect;
         float offsetY = (areaCenterY - 0.5f) * 2f * cam.orthographicSize;

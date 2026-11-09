@@ -133,4 +133,20 @@ public class LevelCreator : MonoBehaviour
         }
         return grid[row, column];
     }
+    public Cell GetCellAtWorldPosition(Vector3 worldPos)
+    {
+        Vector3 local = worldPos - cellFather.position;
+        int row = Mathf.RoundToInt(local.x / cellSize);
+        int column = Mathf.RoundToInt(local.z / cellSize);
+        return GetCell(row, column);
+    }
+    public Cell GetCellFromRay(Ray ray)
+    {
+        Plane ground = new Plane(Vector3.up, cellFather.position);
+        if (ground.Raycast(ray, out float distance))
+        {
+            return GetCellAtWorldPosition(ray.GetPoint(distance));
+        }
+        return null;
+    }
 }

@@ -2,16 +2,24 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 public class CardPlacementManager : MonoBehaviour
 {
     [SerializeField] private LevelCreator levelCreator;
     [SerializeField] private DeckManager deckManager;
     [SerializeField] private HandUI handUI;
     [SerializeField] private ProductionManager productionManager;
-    [SerializeField] private Material ghostMaterial;
     [SerializeField] private RoundManager roundManager;
     [SerializeField] private Color rejectColor = new Color(1f, 0.2f, 0.2f, 0.6f);
+    [SerializeField] private Material ghostMaterial;
     [SerializeField] private float ghostRejectDuration = 0.3f;
+    [SerializeField] private int maxDragLength = 4;
+    private List<Cell> dragPath = new List<Cell>();
+    private List<GameObject> dragGhosts = new List<GameObject>();
+    private bool hasLastFacingOverride;
+    private Vector2Int lastFacingOverride;
+    private bool isDragging;
+    private GameObject ghost;
     private float ghostRejectTime;
 
     private Card cardSelected;
@@ -19,8 +27,8 @@ public class CardPlacementManager : MonoBehaviour
     private int maxMoves;
     private int movesUsed = 0;
     private Vector2Int pendingFacing = new Vector2Int(1, 0);
-    private GameObject ghost;
     private CardUI selectedCardUI;
+    private int lastPreviewCost = -2;
 
     public void StartLevel(LevelData levelData)
     {
@@ -71,6 +79,11 @@ public class CardPlacementManager : MonoBehaviour
         }
         if (cell.CanBuild)
         {
+            if (IsBeltCard(cardSelected))
+            {
+                StartDrag(cell);
+                return;
+            }
             cellSelected = cell;
             PlaceCard();
         }
@@ -111,13 +124,7 @@ public class CardPlacementManager : MonoBehaviour
             RejectPlacement();
             return;
         }
-        GameObject placedConstruction = Instantiate(construction.InstancePrefab, cellSelected.transform.position, FacingToRotation());
-        cellSelected.SetCurrentConstruction(placedConstruction);
-        ConstructionBehaviour constructionBehaviour = placedConstruction.GetComponent<ConstructionBehaviour>();
-        constructionBehaviour.SetCell(cellSelected);
-        constructionBehaviour.SetLevelCreator(levelCreator);
-        constructionBehaviour.SetFacing(pendingFacing);
-        productionManager.RegisterConstruction(constructionBehaviour);
+        BuildAt(cellSelected, construction, pendingFacing);
         deckManager.DiscardCard(cardSelected);
         deckManager.DealCards();
         handUI.RefreshHand();
@@ -129,38 +136,233 @@ public class CardPlacementManager : MonoBehaviour
         DestroyGhost();
         cellSelected = null;
     }
-    public void OnCellHover(Cell cell)
+    private void BuildAt(Cell cell, CardConstruction construction, Vector2Int facing)
     {
-        if (ghost == null || !cell.CanBuild)
+        GameObject placed = Instantiate(construction.InstancePrefab, cell.transform.position, FacingToRotation(facing));
+        cell.SetCurrentConstruction(placed);
+        ConstructionBehaviour behaviour = placed.GetComponent<ConstructionBehaviour>();
+        behaviour.SetCell(cell);
+        behaviour.SetLevelCreator(levelCreator);
+        behaviour.SetFacing(facing);
+        productionManager.RegisterConstruction(behaviour);
+    }
+    private bool IsBeltCard(Card card)
+    {
+        CardConstruction construction = card as CardConstruction;
+        return construction != null && construction.Type == CardConstruction.ConstructionType.ConveyorBelt;
+    }
+    private void StartDrag(Cell cell)
+    {
+        if (cell.IsBusy)
         {
+            RejectPlacement();
+            return;
+        }
+        dragPath.Clear();
+        dragPath.Add(cell);
+        isDragging = true;
+        hasLastFacingOverride = false;
+        if (ghost != null)
+        {
+            ghost.SetActive(false);
+        }
+        RefreshDragPreview();
+    }
+    private int GetDragLimit()
+    {
+        int beltsInHand = 0;
+        foreach (Card card in deckManager.Hand)
+        {
+            if (card == cardSelected)
+            {
+                beltsInHand++;
+            }
+        }
+        return Mathf.Min(beltsInHand, maxDragLength);
+    }
+    private int GetDragCost(CardConstruction construction)
+    {
+        int total = 0;
+        foreach (Cell cell in dragPath)
+        {
+            total += cell.GetEnergyCost(construction.MoveCost);
+        }
+        return total;
+    }
+    private void ExtendDrag(Cell cell)
+    {
+        CardConstruction construction = cardSelected as CardConstruction;
+        Cell last = dragPath[dragPath.Count - 1];
+        if (cell == last)
+        {
+            return;
+        }
+        if (dragPath.Count >= 2 && cell == dragPath[dragPath.Count - 2])
+        {
+            dragPath.RemoveAt(dragPath.Count - 1);
+            hasLastFacingOverride = false;
+            RefreshDragPreview();
+            return;
+        }
+        if (dragPath.Contains(cell))
+        {
+            return;
+        }
+        Vector2Int step = cell.GridPosition - last.GridPosition;
+        if (Mathf.Abs(step.x) + Mathf.Abs(step.y) != 1)
+        {
+            return;
+        }
+        if (!cell.CanBuild || cell.IsBusy)
+        {
+            return;
+        }
+        if (dragPath.Count >= GetDragLimit())
+        {
+            return;
+        }
+        if (movesUsed + GetDragCost(construction) + cell.GetEnergyCost(construction.MoveCost) > maxMoves)
+        {
+            return;
+        }
+        dragPath.Add(cell);
+        hasLastFacingOverride = false;
+        RefreshDragPreview();
+    }
+    private Vector2Int GetDragFacing(int index)
+    {
+        bool isLast = index == dragPath.Count - 1;
+        if (isLast && hasLastFacingOverride)
+        {
+            return lastFacingOverride;
+        }
+        if (dragPath.Count == 1)
+        {
+            return pendingFacing;
+        }
+        int from = index < dragPath.Count - 1 ? index : index - 1;
+        return dragPath[from + 1].GridPosition - dragPath[from].GridPosition;
+    }
+    private void RefreshDragPreview()
+    {
+        CardConstruction construction = cardSelected as CardConstruction;
+        if (construction == null)
+        {
+            return;
+        }
+        while (dragGhosts.Count < dragPath.Count)
+        {
+            dragGhosts.Add(CreateGhostObject(construction));
+        }
+        while (dragGhosts.Count > dragPath.Count)
+        {
+            int last = dragGhosts.Count - 1;
+            Destroy(dragGhosts[last]);
+            dragGhosts.RemoveAt(last);
+        }
+        for (int i = 0; i < dragPath.Count; i++)
+        {
+            dragGhosts[i].transform.position = dragPath[i].transform.position;
+            dragGhosts[i].transform.rotation = FacingToRotation(GetDragFacing(i));
+            dragGhosts[i].SetActive(true);
+        }
+        NotifyCostPreview(GetDragCost(construction));
+    }
+    private void ClearDragGhosts()
+    {
+        foreach (GameObject dragGhost in dragGhosts)
+        {
+            Destroy(dragGhost);
+        }
+        dragGhosts.Clear();
+    }
+    private void RotateLastDragGhost()
+    {
+        Vector2Int current = GetDragFacing(dragPath.Count - 1);
+        lastFacingOverride = new Vector2Int(-current.y, current.x);
+        hasLastFacingOverride = true;
+        RefreshDragPreview();
+    }
+    private void FinishDrag()
+    {
+        isDragging = false;
+        ClearDragGhosts();
+        NotifyCostPreview(-1);
+        CardConstruction construction = cardSelected as CardConstruction;
+        if (construction == null || dragPath.Count == 0)
+        {
+            dragPath.Clear();
+            return;
+        }
+        int totalCost = GetDragCost(construction);
+        if (movesUsed + totalCost > maxMoves)
+        {
+            RejectPlacement();
+            dragPath.Clear();
+            return;
+        }
+        for (int i = 0; i < dragPath.Count; i++)
+        {
+            BuildAt(dragPath[i], construction, GetDragFacing(i));
+            deckManager.DiscardCard(cardSelected);
+        }
+        deckManager.DealCards();
+        handUI.RefreshHand();
+        movesUsed += totalCost;
+        NotifyEnergy();
+        selectedCardUI = null;
+        cardSelected = null;
+        NotifyCostPreview(-1);
+        DestroyGhost();
+        dragPath.Clear();
+    }
+    private Cell GetCellUnderMouse()
+    {
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return null;
+        }
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        return levelCreator.GetCellFromRay(ray);
+    }
+    private void UpdateHover(Cell cell)
+    {
+        if (isDragging)
+        {
+            return;
+        }
+        if (ghost == null || cell == null || !cell.CanBuild || cell.IsBusy)
+        {
+            NotifyCostPreview(-1);
+            if (ghost != null)
+            {
+                ghost.SetActive(false);
+            }
             return;
         }
         NotifyCostPreview(cell.GetEnergyCost(cardSelected.MoveCost));
         ghost.transform.position = cell.transform.position;
         ghost.SetActive(true);
     }
-    public void OnCellExit(Cell cell)
+    private GameObject CreateGhostObject(CardConstruction construction)
     {
-        NotifyCostPreview(-1);
-        if (ghost != null)
+        GameObject instance = Instantiate(construction.InstancePrefab, Vector3.zero, FacingToRotation());
+        Destroy(instance.GetComponent<ConstructionBehaviour>());
+        foreach (Collider col in instance.GetComponentsInChildren<Collider>())
         {
-            ghost.SetActive(false);
+            Destroy(col);
         }
+        foreach (Renderer rend in instance.GetComponentsInChildren<Renderer>())
+        {
+            rend.material = ghostMaterial;
+        }
+        instance.SetActive(false);
+        return instance;
     }
     private void CreateGhost(CardConstruction construction)
     {
         DestroyGhost();
-        ghost = Instantiate(construction.InstancePrefab, Vector3.zero, FacingToRotation());
-        Destroy(ghost.GetComponent<ConstructionBehaviour>());
-        foreach (Collider col in ghost.GetComponentsInChildren<Collider>())
-        {
-            Destroy(col);
-        }
-        foreach (Renderer rend in ghost.GetComponentsInChildren<Renderer>())
-        {
-            rend.material = ghostMaterial;
-        }
-        ghost.SetActive(false);
+        ghost = CreateGhostObject(construction);
     }
     private void DestroyGhost()
     {
@@ -189,12 +391,19 @@ public class CardPlacementManager : MonoBehaviour
             rend.material.color = color;
         }
     }
+    private Quaternion FacingToRotation(Vector2Int facing)
+    {
+        return Quaternion.LookRotation(new Vector3(facing.x, 0, facing.y));
+    }
     private Quaternion FacingToRotation()
     {
-        return Quaternion.LookRotation(new Vector3(pendingFacing.x, 0, pendingFacing.y));
+        return FacingToRotation(pendingFacing);
     }
     public void CancelSelection()
     {
+        isDragging = false;
+        dragPath.Clear();
+        ClearDragGhosts();
         if(selectedCardUI != null)
         {
             selectedCardUI.SetSelected(false);
@@ -209,10 +418,17 @@ public class CardPlacementManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            pendingFacing = new Vector2Int(-pendingFacing.y, pendingFacing.x);
-            if(ghost != null)
+            if (isDragging)
             {
-                ghost.transform.rotation = FacingToRotation();
+                RotateLastDragGhost();
+            }
+            else
+            {
+                pendingFacing = new Vector2Int(-pendingFacing.y, pendingFacing.x);
+                if (ghost != null)
+                {
+                    ghost.transform.rotation = FacingToRotation();
+                }
             }
         }
         if (ghostRejectTime > 0f)
@@ -225,6 +441,24 @@ public class CardPlacementManager : MonoBehaviour
         {
             CancelSelection();
         }
+        Cell hovered = GetCellUnderMouse();
+        UpdateHover(hovered);
+        if (Input.GetMouseButtonDown(0) && hovered != null)
+        {
+            OnCellSelected(hovered);
+        }
+        if (isDragging)
+        {
+            Cell cell = GetCellUnderMouse();
+            if (cell != null)
+            {
+                ExtendDrag(cell);
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                FinishDrag();
+            }
+        }
     }
     public static event Action<int, int> OnEnergyChange;
     private void NotifyEnergy()
@@ -234,6 +468,11 @@ public class CardPlacementManager : MonoBehaviour
     public static event Action<int> OnCostPreview;
     private void NotifyCostPreview(int cost)
     {
+        if (cost == lastPreviewCost)
+        {
+            return;
+        }
+        lastPreviewCost = cost;
         OnCostPreview?.Invoke(cost);
     }
 }
