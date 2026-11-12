@@ -7,7 +7,9 @@ public abstract class ConstructionBehaviour : MonoBehaviour
     protected Cell cell;
     protected Vector2Int facing = new Vector2Int(1, 0);
     public virtual bool AcceptItems => false;
-    public bool HasItem => cell != null && cell.ResourceItem != null;
+    public virtual bool HasItem => cell != null && cell.ResourceItem != null;
+    public virtual bool AcceptsFromBelt => false;
+    protected List<Cell> occupiedCells = new List<Cell>();
     public Vector2Int GridPosition => cell.GridPosition;
     public virtual void StopProduction() { }
     public void SetFacing(Vector2Int direction)
@@ -63,6 +65,10 @@ public abstract class ConstructionBehaviour : MonoBehaviour
             depth++;
         }
         return depth;
+    }
+    public void SetOccupiedCells(List<Cell> cells)
+    {
+        occupiedCells = cells;
     }
     public abstract void Tick();
 }

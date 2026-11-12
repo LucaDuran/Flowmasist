@@ -102,29 +102,35 @@ public class CardPlacementManager : MonoBehaviour
         {
             return;
         }
-        int energyCost = cellSelected.GetEnergyCost(cardSelected.MoveCost);
-
-        if (movesUsed + energyCost > maxMoves)
-        {
-            Debug.LogWarning("No moves left to place card.");
-            RejectPlacement();
-            return;
-        }
-        if (cellSelected.IsBusy)
-        {
-            Debug.LogWarning("Cell is already occupied.");
-            RejectPlacement();
-            return;
-        }
         CardConstruction construction = cardSelected as CardConstruction;
         if (construction == null)
         {
             RejectPlacement();
             return;
         }
+        List<Cell> footprint = GetFootprint(cellSelected, construction, pendingFacing);
+        if (footprint == null)
+        {
+            RejectPlacement();
+            return;
+        }
+        int energyCost = 0;
+        foreach (Cell footprintCell in footprint)
+        {
+            if(!footprintCell.CanBuild || footprintCell.IsBusy)
+            {
+                RejectPlacement();
+                return;
+            }
+            energyCost += footprintCell.GetEnergyCost(construction.MoveCost);
+        }
+        if (movesUsed + energyCost > maxMoves)
+        {
+            RejectPlacement();
+            return;
+        }
         if (construction.Type == CardConstruction.ConstructionType.Extractor && !cellSelected.IsExtractionZone)
         {
-            Debug.LogWarning("Extractor can only be placed in extraction zones.");
             RejectPlacement();
             return;
         }
@@ -142,10 +148,19 @@ public class CardPlacementManager : MonoBehaviour
     }
     private void BuildAt(Cell cell, CardConstruction construction, Vector2Int facing)
     {
-        GameObject placed = Instantiate(construction.InstancePrefab, cell.transform.position, FacingToRotation(facing));
-        cell.SetCurrentConstruction(placed);
+        List<Cell> footprint = GetFootprint(cell, construction, facing);
+        if (footprint == null)
+        {
+            return;
+        }
+        GameObject placed = Instantiate(construction.InstancePrefab, GetFootprintCenter(footprint), FacingToRotation(facing));
+        foreach (Cell footprintCell in footprint)
+        {
+            footprintCell.SetCurrentConstruction(placed);
+        }
         ConstructionBehaviour behaviour = placed.GetComponent<ConstructionBehaviour>();
         behaviour.SetCell(cell);
+        behaviour.SetOcuppiedCells(footprint);
         behaviour.SetLevelCreator(levelCreator);
         behaviour.SetFacing(facing);
         productionManager.RegisterConstruction(behaviour);
@@ -153,6 +168,61 @@ public class CardPlacementManager : MonoBehaviour
         {
             beltsUsed++;
         }
+    }
+    private List<Cell> GetFootprint(Cell origin, CardConstruction construction, Vector2Int facing)
+    {
+        List<Cell> cells = new List<Cell>();
+        Vector2Int side = new Vector2Int(-facing.y, facing.x);
+        for (int i = 0; i < construction.Size.x; i++)
+        {
+            for(int j = 0; j < construction.Size.y; j++)
+            {
+                Vector2Int position = origin.GridPosition + facing * i + side * j;
+                Cell found = levelCreator.GetCell(position.x, position.y);
+                if (found == null)
+                {
+                    return null;
+                }
+                cells.Add(found);
+            }
+        }
+        return cells;
+    }
+    private bool IsFootprintFree(List<Cell> footprint)
+    {
+        if (footprint == null)
+        {
+            return false;
+        }
+        foreach (Cell footprintCell in footprint)
+        {
+            if (!footprintCell.CanBuild || footprintCell.IsBusy)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    private bool CanPlace(Cell origin, CardConstruction construction, List<Cell> footprint)
+    {
+        if (!IsFootprintFree(footprint))
+        {
+            return false;
+        }
+        if (construction.Type == CardConstruction.ConstructionType.Extractor && !origin.IsExtractionZone)
+        {
+            return false;
+        }
+        return true;
+    }
+    private Vector3 GetFootprintCenter(List<Cell> footprint)
+    {
+        Vector3 center = Vector3.zero;
+        foreach (Cell footprintCell in footprint)
+        {
+            center += footprintCell.transform.position;
+        }
+        return center / footprint.Count;
     }
     private bool IsBeltCard(Card card)
     {
@@ -339,7 +409,13 @@ public class CardPlacementManager : MonoBehaviour
         {
             return;
         }
-        if (ghost == null || cell == null || !cell.CanBuild || cell.IsBusy)
+        CardConstruction construction = cardSelected as CardConstruction;
+        List<Cell> footprint = null;
+        if (ghost != null && cell != null && construction != null)
+        {
+            footprint = GetFootprint(cell, construction, pendingFacing);
+        }
+       if (footprint == null)
         {
             NotifyCostPreview(-1);
             if (ghost != null)
@@ -348,9 +424,26 @@ public class CardPlacementManager : MonoBehaviour
             }
             return;
         }
-        NotifyCostPreview(cell.GetEnergyCost(cardSelected.MoveCost));
-        ghost.transform.position = cell.transform.position;
+        bool valid = CanPlace(cell, construction, footprint);
+        ghost.transform.position = GetFootprintCenter(footprint);
         ghost.SetActive(true);
+        if (ghostRejectTime <= 0f)
+        {
+            SetGhostColor(valid ? ghostMaterial.color : rejectColor);
+        }
+        if (valid)
+        {
+            int cost = 0;
+            foreach (Cell footprintCell in footprint)
+            {
+                cost += footprintCell.GetEnergyCost(construction.MoveCost);
+            }
+            NotifyCostPreview(cost);
+        }
+        else
+        {
+            NotifyCostPreview(-1);
+        }
     }
     private GameObject CreateGhostObject(CardConstruction construction)
     {
