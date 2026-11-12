@@ -26,6 +26,7 @@ public class RoundManager : MonoBehaviour
     private RoundPhase phase;
     public bool IsSetup => phase == RoundPhase.Setup;
     public static event Action<RoundResult> OnRoundFinished;
+    public static event Action OnRoundStarted;
     private IReadOnlyList<LevelObjective> objectives;
 
     private void OnEnable()
@@ -58,6 +59,7 @@ public class RoundManager : MonoBehaviour
         executeButton.interactable = false;
         discardButton.interactable = false;
         productionManager.StartProduction(executionTicks);
+        OnRoundStarted?.Invoke();
     }
     public void OnRetryButtonPressed()
     {

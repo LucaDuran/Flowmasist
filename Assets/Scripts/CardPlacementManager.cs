@@ -160,7 +160,7 @@ public class CardPlacementManager : MonoBehaviour
         }
         ConstructionBehaviour behaviour = placed.GetComponent<ConstructionBehaviour>();
         behaviour.SetCell(cell);
-        behaviour.SetOcuppiedCells(footprint);
+        behaviour.SetOccupiedCells(footprint);
         behaviour.SetLevelCreator(levelCreator);
         behaviour.SetFacing(facing);
         productionManager.RegisterConstruction(behaviour);
