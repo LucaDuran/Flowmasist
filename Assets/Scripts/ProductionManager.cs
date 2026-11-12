@@ -30,7 +30,20 @@ public class ProductionManager : MonoBehaviour
         isRunning = true;
         activeConstructions.RemoveAll(c => c == null);
         int maxSteps = activeConstructions.Count;
-        activeConstructions.Sort((a, b) => a.GetDepth(maxSteps).CompareTo(b.GetDepth(maxSteps)));
+        activeConstructions.Sort((a, b) =>
+        {
+            int result = a.GetDepth(maxSteps).CompareTo(b.GetDepth(maxSteps));
+            if (result != 0)
+            {
+                return result;
+            }
+            result = a.GridPosition.x.CompareTo(b.GridPosition.x);
+            if (result != 0)
+            {
+                return result;
+            }
+            return a.GridPosition.y.CompareTo(b.GridPosition.y);
+        });
         InvokeRepeating("TickAll", 0.5f, 0.5f);
     }
     private void TickAll()

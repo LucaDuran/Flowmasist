@@ -8,6 +8,7 @@ public abstract class ConstructionBehaviour : MonoBehaviour
     protected Vector2Int facing = new Vector2Int(1, 0);
     public virtual bool AcceptItems => false;
     public bool HasItem => cell != null && cell.ResourceItem != null;
+    public Vector2Int GridPosition => cell.GridPosition;
     public virtual void StopProduction() { }
     public void SetFacing(Vector2Int direction)
     {
