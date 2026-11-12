@@ -11,6 +11,7 @@ public class CardConstruction : Card
         Chest,
         ConveyorBelt,
         Arm,
+        Splitter,
 
     }
     [SerializeField] private ConstructionType constructionType;

@@ -15,6 +15,7 @@ public class Cell : MonoBehaviour
     public bool IsBusy => currentConstruction != null;
     public bool HasConveyor => currentConstruction != null && currentConstruction.GetComponent<ConveyorBelt>() != null;
     public bool AcceptsItems => currentConstruction != null && currentConstruction.GetComponent<ConstructionBehaviour>().AcceptItems;
+    public bool AcceptsFromBelt => currentConstruction != null && currentConstruction.GetComponent<ConstructionBehaviour>().AcceptsFromBelt;
 
     private Vector2Int gridPosition;
     public Vector2Int GridPosition => gridPosition;
