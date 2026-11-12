@@ -18,7 +18,7 @@ MonoBehaviour:
   energy: 50
   quota: 5
   canRotate: 0
-  executionTicks: 60
+  executionTicks: 30
   objectives:
   - type: 0
     target: 5

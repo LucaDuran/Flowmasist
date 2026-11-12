@@ -1,0 +1,9 @@
+#Level 4
+X5...3.X
+X.XXXX.X
+..+...-.
+.XX.XX..
+....4...
+XX.XX.XX
+X......X
+X..-M+.X

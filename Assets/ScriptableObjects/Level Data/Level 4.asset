@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48366fa462630964199c8f31a6dcf532, type: 3}
+  m_Name: Level 4
+  m_EditorClassIdentifier: 
+  levelName: Level 4
+  map: {fileID: 4900000, guid: 5e0c2298e54b5094aa7b2a3201af3b6b, type: 3}
+  deck: {fileID: 11400000, guid: 2fb833cfc7b4d22499d5d67c13b17e33, type: 2}
+  energy: 140
+  quota: 36
+  canRotate: 0
+  executionTicks: 30
+  objectives:
+  - type: 0
+    target: 38
+  - type: 1
+    target: 130
