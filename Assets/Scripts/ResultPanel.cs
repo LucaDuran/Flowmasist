@@ -8,8 +8,8 @@ public class ResultPanel : MonoBehaviour
 {
     [SerializeField] private GameObject panel;
     [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI deliveredText;
-    [SerializeField] private TextMeshProUGUI energyText;
+    [SerializeField] private TextMeshProUGUI starsText;
+    [SerializeField] private TextMeshProUGUI objectivesText;
     [SerializeField] private GameObject nextButton;
     [SerializeField] private LevelList levelList;
     private int usedEnergy;
@@ -18,12 +18,10 @@ public class ResultPanel : MonoBehaviour
     private void OnEnable()
     {
         RoundManager.OnRoundFinished += ShowResult;
-        CardPlacementManager.OnEnergyChange += SaveEnergy;
     }
     private void OnDisable()
     {
         RoundManager.OnRoundFinished -= ShowResult;
-        CardPlacementManager.OnEnergyChange -= SaveEnergy;
     }
     public void OnNextButtonPressed()
     {
@@ -34,18 +32,19 @@ public class ResultPanel : MonoBehaviour
     {
         panel.SetActive(false);
     }
-    private void SaveEnergy(int used, int max)
+    private void ShowResult(RoundResult result)
     {
-        usedEnergy = used;
-        maxEnergy = max;
-    }
-    private void ShowResult(bool won, int delivered, int quota)
-    {
-        titleText.text = won ? "Level completed!" : "Level failed";
-        deliveredText.text = "Delivered: " + delivered + " / " + quota;
-        energyText.text = "Energy: " + usedEnergy + " / " + maxEnergy;
+        string text = "";
+        foreach (ObjectiveResult objective in result.Objectives)
+        {
+            string mark = objective.Met ? "[X]" : "[ ]";
+            text += mark + " " + objective.Description + " (you: " + objective.Value + ")" + "\n";
+        }
+        objectivesText.text = text;
+        titleText.text = result.Won ? "Level completed!" : "Level failed";
+        starsText.text = "Stars: " + result.Stars + " / " + result.MaxStars;
         bool hasNext = GameSession.CurrentIndex + 1 < levelList.Count;
-        nextButton.SetActive(won && hasNext);
+        nextButton.SetActive(result.Won && hasNext);
         panel.SetActive(true);
     }
 }

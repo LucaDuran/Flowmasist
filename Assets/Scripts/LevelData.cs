@@ -19,4 +19,6 @@ public class LevelData : ScriptableObject
     public bool CanRotate => canRotate;
     [SerializeField] private int executionTicks;
     public int ExecutionTicks => executionTicks;
+    [SerializeField] private List<LevelObjective> objectives = new List<LevelObjective>();
+    public IReadOnlyList<LevelObjective> Objectives => objectives;
 }

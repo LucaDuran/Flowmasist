@@ -16,6 +16,13 @@ MonoBehaviour:
   map: {fileID: 4900000, guid: 04dae5cdc08fb1042bc9da9e1de7d46f, type: 3}
   deck: {fileID: 11400000, guid: 2fb833cfc7b4d22499d5d67c13b17e33, type: 2}
   energy: 50
-  quota: 20
+  quota: 25
   canRotate: 0
   executionTicks: 30
+  objectives:
+  - type: 0
+    target: 25
+  - type: 1
+    target: 45
+  - type: 2
+    target: 6

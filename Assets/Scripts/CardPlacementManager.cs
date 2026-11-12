@@ -29,10 +29,14 @@ public class CardPlacementManager : MonoBehaviour
     private Vector2Int pendingFacing = new Vector2Int(1, 0);
     private CardUI selectedCardUI;
     private int lastPreviewCost = -2;
+    private int beltsUsed;
+    public int EnergyUsed => movesUsed;
+    public int BeltsUsed => beltsUsed;
 
     public void StartLevel(LevelData levelData)
     {
         movesUsed = 0;
+        beltsUsed = 0;
         maxMoves = levelData.Energy;
         NotifyEnergy();
     }
@@ -145,6 +149,10 @@ public class CardPlacementManager : MonoBehaviour
         behaviour.SetLevelCreator(levelCreator);
         behaviour.SetFacing(facing);
         productionManager.RegisterConstruction(behaviour);
+        if (construction.Type == CardConstruction.ConstructionType.ConveyorBelt)
+        {
+            beltsUsed++;
+        }
     }
     private bool IsBeltCard(Card card)
     {

@@ -25,7 +25,8 @@ public class RoundManager : MonoBehaviour
     private int executionTicks;
     private RoundPhase phase;
     public bool IsSetup => phase == RoundPhase.Setup;
-    public static event Action<bool, int, int> OnRoundFinished;
+    public static event Action<RoundResult> OnRoundFinished;
+    private IReadOnlyList<LevelObjective> objectives;
 
     private void OnEnable()
     {
@@ -44,6 +45,7 @@ public class RoundManager : MonoBehaviour
         quota = levelData.Quota;
         executionTicks = levelData.ExecutionTicks;
         delivered = 0;
+        objectives = levelData.Objectives;
         phase = RoundPhase.Setup;
         UpdateText();
     }
@@ -72,11 +74,54 @@ public class RoundManager : MonoBehaviour
     {
         phase = RoundPhase.Finished;
         bool won = delivered >= quota;
+        RoundStats stats = new RoundStats
+        {
+            Delivered = delivered,
+            EnergyUsed = cardPlacementManager.EnergyUsed,
+            BeltsUsed = cardPlacementManager.BeltsUsed
+        };
         if (won)
         {
             GameSession.CompleteCurrentLevel();
         }
-        OnRoundFinished?.Invoke(won, delivered, quota);
+        int stars = CountStars(won, stats);
+        List<ObjectiveResult> objectivesResults = new List<ObjectiveResult>();
+        foreach (LevelObjective objective in objectives)
+        {
+            ObjectiveResult entry = new ObjectiveResult
+            {
+                Description = objective.Describe(),
+                Met = objective.IsMet(stats),
+                Value = objective.GetValue(stats)
+            };
+            objectivesResults.Add(entry);
+        }
+        RoundResult result = new RoundResult
+        {
+            Won = won,
+            Objectives = objectivesResults,
+            Delivered = delivered,
+            Quota = quota,
+            Stars = stars,
+            MaxStars = objectives.Count
+        };
+        OnRoundFinished?.Invoke(result);
+    }
+    private int CountStars(bool won, RoundStats stats)
+    {
+        if (!won)
+        {
+            return 0;
+        }
+        int stars = 0;
+        foreach (LevelObjective objective in objectives)
+        {
+           if (objective.IsMet(stats))
+           {
+               stars++;
+           }
+        }
+        return stars;
     }
     private void CheckQuotaReachable()
     {
