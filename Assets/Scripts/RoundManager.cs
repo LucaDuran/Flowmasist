@@ -31,13 +31,11 @@ public class RoundManager : MonoBehaviour
     private void OnEnable()
     {
         Chest.OnResourceCollected += HandleResourceCollected;
-        ProductionManager.OnTickProcessed += CheckQuotaReachable;
         ProductionManager.OnProductionFinished += HandleProductionFinished;
     }
     private void OnDisable()
     {
         Chest.OnResourceCollected -= HandleResourceCollected;
-        ProductionManager.OnTickProcessed -= CheckQuotaReachable;
         ProductionManager.OnProductionFinished -= HandleProductionFinished;
     }
     public void StartRound(LevelData levelData)
