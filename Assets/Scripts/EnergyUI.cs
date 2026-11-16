@@ -9,12 +9,13 @@ public class EnergyUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI energyText;
     [SerializeField] private Image pipPrefab;
     [SerializeField] private Transform pipContainer;
-    [SerializeField] private int energyPerPip = 5;
+    [SerializeField] private int maxPips = 20;
     [SerializeField] private Color pipFullColor = Color.green;
     [SerializeField] private Color pipSpentColor = new Color(0.2f, 0.2f, 0.2f, 1f);
     [SerializeField] private Color pipPreviewColor = Color.yellow;
     [SerializeField] private Color pipOverColor = Color.red;
     private List<Image> pips = new List<Image>();
+    private int energyPerPip = 5;
     private int previewCost = -1;
     private int usedEnergy;
     private int maxEnergy;
@@ -32,9 +33,11 @@ public class EnergyUI : MonoBehaviour
     {
         usedEnergy = used;
         maxEnergy = max;
-        if (pips.Count != max / energyPerPip)
+        energyPerPip = 5 * Mathf.CeilToInt(max / 5f / maxPips);
+        int count = Mathf.CeilToInt(max / (float)energyPerPip);
+        if (pips.Count != count)
         {
-            BuildPips(max);
+            BuildPips(count);
         }
         RefreshPips();
         RefreshText();
@@ -45,14 +48,13 @@ public class EnergyUI : MonoBehaviour
         RefreshPips();
         RefreshText();
     }
-    private void BuildPips(int max)
+    private void BuildPips(int count)
     {
         foreach (Image pip in pips)
         {
             Destroy(pip.gameObject);
         }
         pips.Clear();
-        int count = max / energyPerPip;
         for(int i = 0; i < count; i++)
         {
             Image pip = Instantiate(pipPrefab, pipContainer);
@@ -61,8 +63,8 @@ public class EnergyUI : MonoBehaviour
     }
     private void RefreshPips()
     {
-        int usedPips = usedEnergy / energyPerPip;
-        int previewPips = previewCost < 0 ? 0 : previewCost / energyPerPip;
+        int usedPips = Mathf.CeilToInt(usedEnergy / (float)energyPerPip);
+        int previewPips = previewCost < 0 ? 0 : Mathf.CeilToInt((usedEnergy + previewCost) / (float)energyPerPip) - usedPips;
         bool tooExpensive = previewCost >= 0 && usedEnergy + previewCost > maxEnergy;
         for (int i = 0; i < pips.Count; i++)
         {
