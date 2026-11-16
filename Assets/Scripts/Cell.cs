@@ -27,12 +27,18 @@ public class Cell : MonoBehaviour
     private int stock = -1;
     public bool HasStock => stock != 0;
     public int Stock => stock;
+    private GameObject itemPrefab;
+    public GameObject ItemPrefab => itemPrefab;
     public void Initialize(Vector2Int position, bool canBuild, bool isExtractionZone, bool isLowEnergyZone)
     {
         gridPosition = position;
         this.canBuild = canBuild;
         this.isExtractionZone = isExtractionZone;
         this.isLowEnergyZone = isLowEnergyZone;
+    }
+    public void SetItemPrefab(GameObject prefab)
+    {
+        itemPrefab = prefab;
     }
     public void SetCanBuild(bool canBuild)
     {

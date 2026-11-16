@@ -51,6 +51,23 @@ public abstract class ConstructionBehaviour : MonoBehaviour
     {
         return GetConstructionAt(-facing);
     }
+    protected bool TryPushToBelt()
+    {
+        if (cell.ResourceItem == null)
+        {
+            return false;
+        }
+        Cell nextCell = GetNeighbor(GetDirectionVector());
+        if (nextCell == null || nextCell.ResourceItem != null || !nextCell.HasConveyor)
+        {
+            return false;
+        }
+        ResourceItem item = cell.ResourceItem;
+        item.MoveTo(nextCell.transform.position);
+        nextCell.SetResourceItem(item);
+        cell.SetResourceItem(null);
+        return true;
+    }
     public int GetDepth(int maxSteps)
     {
         int depth = 0;

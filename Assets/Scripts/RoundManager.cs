@@ -15,19 +15,20 @@ public enum RoundPhase
 
 public class RoundManager : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI quotaText;
     [SerializeField] private ProductionManager productionManager;
     [SerializeField] private CardPlacementManager cardPlacementManager;
     [SerializeField] private Button executeButton;
     [SerializeField] private Button discardButton;
-    private int quota;
-    private int delivered;
+    private IReadOnlyList<ItemQuota> quotas;
+    private int[] delivered = new int[Enum.GetValues(typeof(ItemType)).Length];
     private int executionTicks;
     private RoundPhase phase;
     public bool IsSetup => phase == RoundPhase.Setup;
     public static event Action<RoundResult> OnRoundFinished;
     public static event Action OnRoundStarted;
     private IReadOnlyList<LevelObjective> objectives;
+    public static event Action<IReadOnlyList<ItemQuota>> OnQuotasSet;
+    public static event Action<ItemType, int> OnDeliveredChanged;
 
     private void OnEnable()
     {
@@ -41,12 +42,16 @@ public class RoundManager : MonoBehaviour
     }
     public void StartRound(LevelData levelData)
     {
-        quota = levelData.Quota;
+        quotas = levelData.Quotas;
         executionTicks = levelData.ExecutionTicks;
-        delivered = 0;
+        delivered = new int[Enum.GetValues(typeof(ItemType)).Length];
+        if (quotas.Count == 0)
+        {
+            Debug.LogError("Level has no quotas: It would be won instantly.");
+        }
         objectives = levelData.Objectives;
         phase = RoundPhase.Setup;
-        UpdateText();
+        OnQuotasSet?.Invoke(quotas);
     }
     public void OnExecuteButtonPressed()
     {
@@ -65,18 +70,18 @@ public class RoundManager : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-    private void HandleResourceCollected()
+    private void HandleResourceCollected(ItemType type)
     {
-        ++delivered;
-        UpdateText();
+        delivered[(int)type]++;
+        OnDeliveredChanged?.Invoke(type, delivered[(int)type]);
     }
     private void HandleProductionFinished()
     {
         phase = RoundPhase.Finished;
-        bool won = delivered >= quota;
+        bool won = AllQuotasMet();
         RoundStats stats = new RoundStats
         {
-            Delivered = delivered,
+            Delivered = TotalDelivered(),
             EnergyUsed = cardPlacementManager.EnergyUsed,
             BeltsUsed = cardPlacementManager.BeltsUsed
         };
@@ -100,8 +105,8 @@ public class RoundManager : MonoBehaviour
         {
             Won = won,
             Objectives = objectivesResults,
-            Delivered = delivered,
-            Quota = quota,
+            Delivered = TotalDelivered(),
+            Quota = TotalQuota(),
             Stars = stars,
             MaxStars = objectives.Count
         };
@@ -123,19 +128,33 @@ public class RoundManager : MonoBehaviour
         }
         return stars;
     }
-    private void CheckQuotaReachable()
+    private bool AllQuotasMet()
     {
-        if (phase != RoundPhase.Executing)
+        foreach (ItemQuota quota in quotas)
         {
-            return;
+            if (delivered[(int)quota.Type] < quota.Amount)
+            {
+                return false;
+            }
         }
-        if (delivered + productionManager.RemainingPotential() < quota)
-        {
-            productionManager.FinishProduction();
-        }
+        return true;
     }
-    private void UpdateText()
+    private int TotalDelivered()
     {
-        quotaText.text = "Resources: " + delivered + "/" + quota;
+        int total = 0;
+        foreach (int amount in delivered)
+        {
+            total += amount;
+        }
+        return total;
+    }
+    private int TotalQuota()
+    {
+        int total = 0;
+        foreach (ItemQuota quota in quotas)
+        {
+            total += quota.Amount;
+        }
+        return total;
     }
 }

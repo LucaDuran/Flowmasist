@@ -6,7 +6,7 @@ using UnityEngine;
 public class Chest : ConstructionBehaviour
 {
     public override bool AcceptItems => true;
-    public static event Action OnResourceCollected;
+    public static event Action<ItemType> OnResourceCollected;
     private int collectedCount = 0;
     public int CollectedCount => collectedCount;
 
@@ -18,11 +18,11 @@ public class Chest : ConstructionBehaviour
     {
         if (cell.ResourceItem != null && cell.ResourceItem.HasArrived)
         {
+            ItemType type = cell.ResourceItem.Type;
             Destroy(cell.ResourceItem.gameObject);
             cell.SetResourceItem(null);
             collectedCount++;
-            OnResourceCollected?.Invoke();
-            Debug.Log("Chest contains: " + collectedCount + " resources");
+            OnResourceCollected?.Invoke(type);
         }
     }
 }

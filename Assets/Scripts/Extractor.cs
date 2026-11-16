@@ -4,24 +4,13 @@ using UnityEngine;
 
 public class Extractor : ConstructionBehaviour
 {
-    [SerializeField] private GameObject resourceItemPrefab;
     private bool canExtract = true;
     public override void Tick()
     {
-        if (cell.ResourceItem != null)
-        {
-            Cell nextCell = GetNeighbor(GetDirectionVector());
-            if (nextCell != null && nextCell.ResourceItem == null && nextCell.HasConveyor)
-            {
-                ResourceItem item = cell.ResourceItem;
-                item.MoveTo(nextCell.transform.position);
-                nextCell.SetResourceItem(item);
-                cell.SetResourceItem(null);
-            }
-        }
+        TryPushToBelt();
         if (cell.ResourceItem == null && canExtract && cell.TryTakeStock())
         {
-            GameObject resourceItem = Instantiate(resourceItemPrefab, cell.transform.position, Quaternion.identity);
+            GameObject resourceItem = Instantiate(cell.ItemPrefab, cell.transform.position, Quaternion.identity);
             cell.SetResourceItem(resourceItem.GetComponent<ResourceItem>());
         }
     }

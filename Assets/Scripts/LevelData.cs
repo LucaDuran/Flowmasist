@@ -13,8 +13,8 @@ public class LevelData : ScriptableObject
     public DeckData Deck => deck;
     [SerializeField] private int energy;
     public int Energy => energy;
-    [SerializeField] private int quota;
-    public int Quota => quota;
+    [SerializeField] private List<ItemQuota> quotas = new List<ItemQuota>();
+    public IReadOnlyList<ItemQuota> Quotas => quotas;
     [SerializeField] private bool canRotate;
     public bool CanRotate => canRotate;
     [SerializeField] private int executionTicks;
