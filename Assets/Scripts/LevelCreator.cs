@@ -7,7 +7,8 @@ public class LevelCreator : MonoBehaviour
     [SerializeField] private GameObject floorPrefab;
     [SerializeField] private GameObject discountPrefab;
     [SerializeField] private GameObject subchargePrefab;
-    [SerializeField] private GameObject veinPrefab;
+    [SerializeField] private GameObject coalVeinPrefab;
+    [SerializeField] private GameObject ironVeinPrefab;
     [SerializeField] private GameObject wallPrefab;
     [SerializeField] private GameObject chestPrefab;
     [SerializeField] private Transform cellFather;
@@ -15,6 +16,8 @@ public class LevelCreator : MonoBehaviour
     [SerializeField] private CardPlacementManager cardPlacementManager;
     [SerializeField] private ProductionManager productionManager;
     [SerializeField] private int stockPerDigit = 5;
+    [SerializeField] private GameObject coalItemPrefab;
+    [SerializeField] private GameObject ironItemPrefab;
     public Vector3 Center { get; private set; }
     public Vector2 Size { get; private set; }
     private Cell[,] grid;
@@ -69,11 +72,23 @@ public class LevelCreator : MonoBehaviour
         bool canBuild = true;
         bool isExtractionZone = false;
         int cellStock = -1;
+        GameObject itemPrefab = null;
+        bool isVein = false;
         if (char.IsDigit(symbol))
         {
-            prefab = veinPrefab;
+            prefab = ironVeinPrefab;
             isExtractionZone = true;
+            isVein = true;
+            itemPrefab = ironItemPrefab;
             cellStock = (symbol - '0') * stockPerDigit;
+        }
+        else if (symbol >= 'a' && symbol <= 'i')
+        {
+            prefab = coalVeinPrefab;
+            isExtractionZone = true;
+            isVein = true;
+            itemPrefab = coalItemPrefab;
+            cellStock = (symbol - 'a' + 1) * stockPerDigit;
         }
         switch (symbol)
         {  
@@ -86,8 +101,9 @@ public class LevelCreator : MonoBehaviour
                 prefab = discountPrefab;
                 break;
             case 'V':
-                prefab = veinPrefab;
+                prefab = ironVeinPrefab;
                 isExtractionZone = true;
+                itemPrefab = ironItemPrefab;
                 break;
             case 'X':
                 prefab = wallPrefab;
@@ -97,7 +113,10 @@ public class LevelCreator : MonoBehaviour
                 canBuild = false;
                 break;
             default:
-                Debug.LogWarning($"Unknown map symbol '{symbol}' at ({row}, {column}). Defaulting to floor.");
+                if (!isVein)
+                {
+                    Debug.LogWarning($"Unknown map symbol '{symbol}' at ({row}, {column}). Defaulting to floor.");
+                }
                 break;
         }
         Vector3 worldPos = cellFather.position + new Vector3(row * cellSize, 0, column * cellSize);
@@ -106,6 +125,7 @@ public class LevelCreator : MonoBehaviour
         Cell cell = cellObject.GetComponent<Cell>();
         cell.Initialize(new Vector2Int(row, column), canBuild, isExtractionZone, false);
         cell.SetCardPlacementManager(cardPlacementManager);
+        cell.SetItemPrefab(itemPrefab);
         if (cellStock > 0)
         {
             cell.SetStock(cellStock);

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48366fa462630964199c8f31a6dcf532, type: 3}
+  m_Name: Level 2B
+  m_EditorClassIdentifier: 
+  levelName: Level 2B
+  map: {fileID: 4900000, guid: a5f10320c4fea1648aa4023fb080802f, type: 3}
+  deck: {fileID: 11400000, guid: d27d0a3826342b94ca1805064e9beccd, type: 2}
+  energy: 100
+  quotas:
+  - type: 1
+    amount: 25
+  canRotate: 0
+  executionTicks: 30
+  objectives:
+  - type: 0
+    target: 28
+  - type: 1
+    target: 80
+  - type: 2
+    target: 9
