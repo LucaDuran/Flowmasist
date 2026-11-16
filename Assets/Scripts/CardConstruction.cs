@@ -12,6 +12,7 @@ public class CardConstruction : Card
         ConveyorBelt,
         Arm,
         Splitter,
+        Furnace,
 
     }
     [SerializeField] private ConstructionType constructionType;

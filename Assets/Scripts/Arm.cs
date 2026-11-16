@@ -8,11 +8,20 @@ public class Arm : ConstructionBehaviour
     {
         Cell source = GetNeighbor(-GetDirectionVector());
         Cell destination = GetNeighbor(GetDirectionVector());
-        if (source == null || destination == null)
+        if (source == null || destination == null || source.ResourceItem == null)
         {
             return;
         }
-        if (source.ResourceItem != null && destination.ResourceItem == null && destination.AcceptsItems)
+        Furnace furnace = GetConstructionAt(GetDirectionVector()) as Furnace;
+        if (furnace != null)
+        {
+            if (furnace.TryInsert(source.ResourceItem))
+            {
+                source.SetResourceItem(null);
+            }
+            return;
+        }
+        if (destination.ResourceItem == null && destination.AcceptsItems)
         {
             destination.SetResourceItem(source.ResourceItem);
             source.ResourceItem.MoveTo(destination.transform.position);

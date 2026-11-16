@@ -32,6 +32,7 @@ public class Splitter : ConstructionBehaviour
             Cell output = GetOutputCell(nextOutput);
             if (output == null || output.ResourceItem != null || !output.HasConveyor)
             {
+                Debug.Log($"Splitter bloqueado en salida {nextOutput}: celda={output}, null={output == null}, ocupada={output != null && output.ResourceItem != null}, tieneCinta={output != null && output.HasConveyor}");
                 return;
             }
             ResourceItem item = lane.ResourceItem;
