@@ -108,7 +108,9 @@ public class RoundManager : MonoBehaviour
             Delivered = TotalDelivered(),
             Quota = TotalQuota(),
             Stars = stars,
-            MaxStars = objectives.Count
+            MaxStars = objectives.Count,
+            EnergyUsed = stats.EnergyUsed,
+            BeltsUsed = stats.BeltsUsed
         };
         OnRoundFinished?.Invoke(result);
     }

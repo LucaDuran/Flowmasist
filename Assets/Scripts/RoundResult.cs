@@ -9,5 +9,7 @@ public struct RoundResult
     public int Quota;
     public int Stars;
     public int MaxStars;
+    public int EnergyUsed;
+    public int BeltsUsed;
     public List<ObjectiveResult> Objectives;
 }
