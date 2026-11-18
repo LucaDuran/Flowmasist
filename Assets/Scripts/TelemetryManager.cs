@@ -9,8 +9,7 @@ public class TelemetryManager : MonoBehaviour
     private const string Token = "j8u54r9mqconwfdg3vth";
 
     private string sessionId;
-    private Dictionary<int, int> attemptsPerLevel = new Dictionary<int, int>();
-    private int currentAttempt;
+    private Dictionary<string, int> attemptsPerLevel = new Dictionary<string, int>();
     private int energyMax;
     private float planningStart;
     private int planningSeconds;
@@ -43,10 +42,6 @@ public class TelemetryManager : MonoBehaviour
     }
     private void HandleLevelStarted(IReadOnlyList<ItemQuota> quotas)
     {
-        int level = GameSession.CurrentIndex + 1;
-        attemptsPerLevel.TryGetValue(level, out int count);
-        currentAttempt = count + 1;
-        attemptsPerLevel[level] = currentAttempt;
         planningStart = Time.realtimeSinceStartup;
     }
     private void HandleEnergy(int used, int max)
@@ -59,13 +54,16 @@ public class TelemetryManager : MonoBehaviour
     }
     private void HandleRoundFinished(RoundResult result)
     {
+        attemptsPerLevel.TryGetValue(result.LevelName, out int previous);
+        int attempt = previous + 1;
+        attemptsPerLevel[result.LevelName] = attempt;
         RoundTelemetry data = new RoundTelemetry
         {
             token = Token,
             session_id = sessionId,
             version = Application.version,
-            level = GameSession.CurrentIndex + 1,
-            attempt = currentAttempt,
+            level_name = result.LevelName,
+            attempt = attempt,
             won = result.Won,
             stars = result.Stars,
             delivered = result.Delivered,
@@ -73,7 +71,8 @@ public class TelemetryManager : MonoBehaviour
             energy_used = result.EnergyUsed,
             energy_max = energyMax,
             belts_used = result.BeltsUsed,
-            planning_sec = planningSeconds
+            planning_sec = planningSeconds,
+            layout = result.Layout
         };
         StartCoroutine(Send(data));
     }

@@ -9,7 +9,7 @@ public class RoundTelemetry
     public string token;
     public string session_id;
     public string version;
-    public int level;
+    public string level_name;
     public int attempt;
     public bool won;
     public int stars;
@@ -19,4 +19,5 @@ public class RoundTelemetry
     public int energy_max;
     public int belts_used;
     public int planning_sec;
+    public string layout;
 }

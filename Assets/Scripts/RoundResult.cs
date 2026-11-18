@@ -11,5 +11,7 @@ public struct RoundResult
     public int MaxStars;
     public int EnergyUsed;
     public int BeltsUsed;
+    public string LevelName;
+    public string Layout;
     public List<ObjectiveResult> Objectives;
 }

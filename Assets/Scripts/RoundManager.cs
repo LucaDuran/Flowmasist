@@ -22,12 +22,14 @@ public class RoundManager : MonoBehaviour
     private IReadOnlyList<ItemQuota> quotas;
     private int[] delivered = new int[Enum.GetValues(typeof(ItemType)).Length];
     private int executionTicks;
+    private string levelName;
     private RoundPhase phase;
     public bool IsSetup => phase == RoundPhase.Setup;
     public static event Action<RoundResult> OnRoundFinished;
     public static event Action OnRoundStarted;
     private IReadOnlyList<LevelObjective> objectives;
     public static event Action<IReadOnlyList<ItemQuota>> OnQuotasSet;
+    public static event Action<IReadOnlyList<LevelObjective>> OnObjectivesSet;
     public static event Action<ItemType, int> OnDeliveredChanged;
 
     private void OnEnable()
@@ -44,12 +46,14 @@ public class RoundManager : MonoBehaviour
     {
         quotas = levelData.Quotas;
         executionTicks = levelData.ExecutionTicks;
+        levelName = levelData.LevelName;
         delivered = new int[Enum.GetValues(typeof(ItemType)).Length];
         if (quotas.Count == 0)
         {
             Debug.LogError("Level has no quotas: It would be won instantly.");
         }
         objectives = levelData.Objectives;
+        OnObjectivesSet?.Invoke(objectives);
         phase = RoundPhase.Setup;
         OnQuotasSet?.Invoke(quotas);
     }
@@ -110,7 +114,9 @@ public class RoundManager : MonoBehaviour
             Stars = stars,
             MaxStars = objectives.Count,
             EnergyUsed = stats.EnergyUsed,
-            BeltsUsed = stats.BeltsUsed
+            BeltsUsed = stats.BeltsUsed,
+            LevelName = levelName,
+            Layout = cardPlacementManager.LayoutString
         };
         OnRoundFinished?.Invoke(result);
     }
