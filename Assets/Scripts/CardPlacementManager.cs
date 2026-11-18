@@ -30,13 +30,36 @@ public class CardPlacementManager : MonoBehaviour
     private CardUI selectedCardUI;
     private int lastPreviewCost = -2;
     private int beltsUsed;
+    private List<ConstructionBehaviour> placedPieces = new List<ConstructionBehaviour>();
     public int EnergyUsed => movesUsed;
     public int BeltsUsed => beltsUsed;
+    public string LayoutString
+    {
+        get
+        {
+            List<string> tokens = new List<string>();
+            foreach (ConstructionBehaviour piece in placedPieces)
+            {
+                tokens.Add(PieceLetter(piece) + piece.GridPosition.x + "," + piece.GridPosition.y + FacingSymbol(piece.Facing));
+            }
+            return string.Join(";", tokens);
+        }
+    }
+    private string PieceLetter(ConstructionBehaviour piece)
+    {
+        if (piece is Extractor) return "E";
+        if (piece is ConveyorBelt) return "B";
+        if (piece is Arm) return "A";
+        if (piece is Splitter) return "S";
+        if (piece is Furnace) return "F";
+        return "?";
+    }
 
     public void StartLevel(LevelData levelData)
     {
         movesUsed = 0;
         beltsUsed = 0;
+        placedPieces.Clear();
         maxMoves = levelData.Energy;
         NotifyEnergy();
     }
@@ -135,6 +158,10 @@ public class CardPlacementManager : MonoBehaviour
             return;
         }
         BuildAt(cellSelected, construction, pendingFacing);
+        if (construction.Type == CardConstruction.ConstructionType.ConveyorBelt)
+        {
+            SnaptToArm(GetBehaviourAt(cellSelected.GridPosition));
+        }
         deckManager.DiscardCard(cardSelected);
         deckManager.DealCards();
         handUI.RefreshHand();
@@ -164,10 +191,30 @@ public class CardPlacementManager : MonoBehaviour
         behaviour.SetLevelCreator(levelCreator);
         behaviour.SetFacing(facing);
         productionManager.RegisterConstruction(behaviour);
+        if (behaviour is ConveyorBelt)
+        {
+            RepairNeighbors(behaviour);
+        }
+        else if (behaviour is Extractor)
+        {
+            TurnTowardAcceptor(behaviour);
+        }
+        else if (behaviour is Arm)
+        {
+            TurnTowardsOutput(behaviour);
+        }
         if (construction.Type == CardConstruction.ConstructionType.ConveyorBelt)
         {
             beltsUsed++;
         }
+        placedPieces.Add(behaviour);
+    }
+    private string FacingSymbol(Vector2Int facing)
+    {
+        if (facing == new Vector2Int(-1, 0)) return "^";
+        if (facing == new Vector2Int(1, 0)) return "v";
+        if (facing == new Vector2Int(0, 1)) return ">";
+        return "<";
     }
     private List<Cell> GetFootprint(Cell origin, CardConstruction construction, Vector2Int facing)
     {
@@ -187,6 +234,108 @@ public class CardPlacementManager : MonoBehaviour
             }
         }
         return cells;
+    }
+    private static readonly Vector2Int[] directions =
+    {
+        new Vector2Int(1,0), new Vector2Int(-1,0), new Vector2Int(0,1), new Vector2Int (0, -1)
+    };
+    private ConstructionBehaviour GetBehaviourAt(Vector2Int position)
+    {
+        Cell found = levelCreator.GetCell(position.x, position.y);
+        if (found == null || found.CurrentConstruction == null)
+        {
+            return null;
+        }
+        return found.CurrentConstruction.GetComponent<ConstructionBehaviour>();
+    }
+    private bool FrontAccepts(ConstructionBehaviour piece)
+    {
+        Vector2Int front = piece.GridPosition + piece.Facing;
+        Cell frontCell = levelCreator.GetCell(front.x, front.y);
+        if (frontCell == null)
+        {
+            return false;
+        }
+        return frontCell.AcceptsFromBelt || GetBehaviourAt(front) is Arm;
+    }
+    private void Reorient(ConstructionBehaviour piece, Vector2Int direction)
+    {
+        piece.SetFacing(direction);
+        piece.transform.rotation = FacingToRotation(direction);
+    }
+    private void RepairNeighbors(ConstructionBehaviour placed)
+    {
+        foreach (Vector2Int dir in directions)
+        {
+            ConstructionBehaviour neighbor = GetBehaviourAt(placed.GridPosition + dir);
+            if (neighbor == null || !(neighbor is ConveyorBelt || neighbor is Extractor))
+            {
+                continue;
+            }
+            if (FrontAccepts(neighbor) || placed.Facing == dir)
+            {
+                continue;
+            }
+            Reorient(neighbor, -dir);
+        }
+    }
+    private void TurnTowardAcceptor(ConstructionBehaviour piece)
+    {
+        if (FrontAccepts(piece))
+        {
+            return;
+        }
+        Vector2Int found = Vector2Int.zero;
+        int count = 0;
+        foreach (Vector2Int dir in directions)
+        {
+            Cell neighbor = levelCreator.GetCell(piece.GridPosition.x + dir.x, piece.GridPosition.y + dir.y);
+            if (neighbor == null || !neighbor.AcceptsFromBelt)
+            {
+                continue;
+            }
+            if (GetBehaviourAt(neighbor.GridPosition).Facing == -dir)
+            {
+                continue;
+            }
+            found = dir;
+            count++;
+        }
+        if (count == 1)
+        {
+            Reorient(piece, found);
+        }
+    }
+    private void TurnTowardsOutput(ConstructionBehaviour arm)
+    {
+        Vector2Int found = Vector2Int.zero;
+        int count = 0;
+        foreach (Vector2Int dir in directions)
+        {
+            ConstructionBehaviour other = GetBehaviourAt(arm.GridPosition + dir);
+            if (other is Chest || other is Furnace)
+            {
+                found = dir;
+                count++;
+            }
+        }
+        if (count == 1)
+        {
+            Reorient(arm, found);
+        }
+    }
+    private void SnaptToArm(ConstructionBehaviour belt)
+    {
+        foreach (Vector2Int dir in directions)
+        {
+            Arm arm = GetBehaviourAt(belt.GridPosition + dir) as Arm;
+            if (arm != null && arm.Facing == dir)
+            {
+                Reorient(belt, dir);
+                RepairNeighbors(belt);
+                return;
+            }
+        }
     }
     private bool IsFootprintFree(List<Cell> footprint)
     {
@@ -383,6 +532,18 @@ public class CardPlacementManager : MonoBehaviour
         {
             BuildAt(dragPath[i], construction, GetDragFacing(i));
             deckManager.DiscardCard(cardSelected);
+        }
+        if (!hasLastFacingOverride)
+        {
+            ConstructionBehaviour lastPiece = GetBehaviourAt(dragPath[dragPath.Count - 1].GridPosition);
+            if (lastPiece != null)
+            {
+                if (lastPiece is ConveyorBelt)
+                {
+                    SnaptToArm(lastPiece);
+                }
+                TurnTowardAcceptor(lastPiece);
+            }
         }
         deckManager.DealCards();
         handUI.RefreshHand();

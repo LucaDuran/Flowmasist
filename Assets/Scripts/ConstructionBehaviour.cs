@@ -11,6 +11,7 @@ public abstract class ConstructionBehaviour : MonoBehaviour
     public virtual bool AcceptsFromBelt => false;
     protected List<Cell> occupiedCells = new List<Cell>();
     public Vector2Int GridPosition => cell.GridPosition;
+    public Vector2Int Facing => facing;
     public virtual void StopProduction() { }
     public void SetFacing(Vector2Int direction)
     {
