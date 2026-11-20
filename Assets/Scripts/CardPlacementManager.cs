@@ -208,6 +208,7 @@ public class CardPlacementManager : MonoBehaviour
             beltsUsed++;
         }
         placedPieces.Add(behaviour);
+        OnPiecePlaced?.Invoke(behaviour);
     }
     private string FacingSymbol(Vector2Int facing)
     {
@@ -723,6 +724,7 @@ public class CardPlacementManager : MonoBehaviour
         }
     }
     public static event Action<int, int> OnEnergyChange;
+    public static event Action<ConstructionBehaviour> OnPiecePlaced;
     private void NotifyEnergy()
     {
         OnEnergyChange?.Invoke(movesUsed, maxMoves);

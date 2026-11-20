@@ -17,7 +17,7 @@ MonoBehaviour:
   deck: {fileID: 11400000, guid: 65dd55bc4a77b134faf649e78e0ee97b, type: 2}
   energy: 50
   quotas:
-  - type: 0
+  - type: 1
     amount: 5
   canRotate: 0
   executionTicks: 30
