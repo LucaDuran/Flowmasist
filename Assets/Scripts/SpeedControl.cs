@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SpeedControl : MonoBehaviour
 {
     [SerializeField] private Button speedButton;
-    [SerializeField] private TextMeshProUGUI label;
+    [SerializeField] private Image icon;
+    [SerializeField] private Sprite[] speedSprites;
     [SerializeField] private float[] speeds = { 1f, 2f, 4f };
     private int index;
     private void OnEnable()
@@ -45,6 +45,9 @@ public class SpeedControl : MonoBehaviour
     private void ApplySpeed()
     {
         Time.timeScale = speeds[index];
-        label.text = "x" + speeds[index];
+        if (icon != null && index < speedSprites.Length)
+        {
+            icon.sprite = speedSprites[index];
+        }
     }
 }

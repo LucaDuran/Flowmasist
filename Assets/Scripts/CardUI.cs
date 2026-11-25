@@ -34,7 +34,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         cardPlacementManager = manager;
         discardController = discard;
         cardIconImage.sprite = cardShowed.CardIcon;
-        cardMoveCostText.text = "E: " + cardShowed.MoveCost;
+        cardMoveCostText.text = "" + cardShowed.MoveCost;
     }
     public void SetSelected(bool selected)
     {

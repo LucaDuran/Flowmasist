@@ -18,7 +18,7 @@ public class CameraRig : MonoBehaviour
     private Vector3 levelCenter;
     private Vector2 levelSize;
     private bool hasLevel;
-    private bool isIso;
+    private bool isIso = true;
     private int quarterTurns;
     private float yaw;
     private float pitch;
