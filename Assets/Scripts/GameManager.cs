@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private HandUI handUI;
     [SerializeField] private RoundManager roundManager;
     [SerializeField] private CameraRig cameraRig;
+    [SerializeField] private TutorialManager tutorialManager;
 
     private void Start()
     {
@@ -25,5 +26,6 @@ public class GameManager : MonoBehaviour
         roundManager.StartRound(currentLevel);
         deckManager.DealCards();
         handUI.RefreshHand();
+        tutorialManager.StartLevel(currentLevel);
     }
 }

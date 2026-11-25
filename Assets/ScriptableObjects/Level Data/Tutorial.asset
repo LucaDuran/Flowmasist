@@ -28,3 +28,30 @@ MonoBehaviour:
     target: 35
   - type: 2
     target: 1
+  tutorialSteps:
+  - message: Select the Extractor card and click the numbered orange tile.
+    trigger: 0
+    restrictCard: 1
+    allowedCard: 0
+    blockPlay: 1
+  - message: Select the Conveyor Belt card and click the tile to the right of the
+      Extractor.
+    trigger: 1
+    restrictCard: 1
+    allowedCard: 2
+    blockPlay: 1
+  - message: Press R to rotate if needed.
+    trigger: 4
+    restrictCard: 0
+    allowedCard: 3
+    blockPlay: 1
+  - message: Select the Arm card and click the tile between the belt and the chest.
+    trigger: 2
+    restrictCard: 1
+    allowedCard: 3
+    blockPlay: 1
+  - message: Press PLAY and watch the items reach the chest.
+    trigger: 3
+    restrictCard: 0
+    allowedCard: 0
+    blockPlay: 0

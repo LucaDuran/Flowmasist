@@ -21,4 +21,6 @@ public class LevelData : ScriptableObject
     public int ExecutionTicks => executionTicks;
     [SerializeField] private List<LevelObjective> objectives = new List<LevelObjective>();
     public IReadOnlyList<LevelObjective> Objectives => objectives;
+    [SerializeField] private List<TutorialStep> tutorialSteps = new List<TutorialStep>();
+    public IReadOnlyList<TutorialStep> TutorialSteps => tutorialSteps;
 }

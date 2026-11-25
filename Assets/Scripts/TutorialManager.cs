@@ -3,27 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-public enum TutorialTrigger
-{
-    ExtractorPlaced,
-    BeltPlaced,
-    ArmPlaced,
-    PlayPressed
-}
-[Serializable]
-public class TutorialStep
-{
-    [TextArea] public string message;
-    public TutorialTrigger trigger;
-}
 public class TutorialManager : MonoBehaviour
 {
     [SerializeField] private GameObject panel;
     [SerializeField] private TextMeshProUGUI messageText;
-    [SerializeField] private TutorialStep[] steps;
-    [SerializeField] private int tutorialLevelIndex = 0;
+    private IReadOnlyList<TutorialStep> steps;
     private HashSet<TutorialTrigger> happened = new HashSet<TutorialTrigger>();
     private int current;
+    public bool IsActive => steps != null && current < steps.Count;
 
     private void OnEnable()
     {
@@ -35,13 +22,10 @@ public class TutorialManager : MonoBehaviour
         CardPlacementManager.OnPiecePlaced -= HandlePiecePlaced;
         RoundManager.OnRoundStarted -= HandlePlayPressed;
     }
-    private void Start()
+    public void StartLevel(LevelData level)
     {
-        if (GameSession.CurrentIndex != tutorialLevelIndex)
-        {
-            panel.SetActive(false);
-            return;
-        }
+        happened.Clear();
+        steps = level.TutorialSteps;
         ShowStep(0);
     }
     private void HandlePiecePlaced(ConstructionBehaviour piece)
@@ -65,8 +49,12 @@ public class TutorialManager : MonoBehaviour
     }
     private void Register(TutorialTrigger trigger)
     {
+        if(steps == null)
+        {
+            return;
+        }
         happened.Add(trigger);
-        while (current < steps.Length && happened.Contains(steps[current].trigger))
+        while (current < steps.Count && steps[current].trigger != TutorialTrigger.Continue && happened.Contains(steps[current].trigger))
         {
             current++;
         }
@@ -75,12 +63,51 @@ public class TutorialManager : MonoBehaviour
     private void ShowStep(int index)
     {
         current = index;
-        if (index >= steps.Length)
+        if (steps == null || index >= steps.Count)
         {
             panel.SetActive(false);
             return;
         }
         panel.SetActive(true);
         messageText.text = steps[index].message;
+    }
+    public bool IsCardAllowed(Card card)
+    {
+        if (steps == null || current >= steps.Count)
+        {
+            return true;
+        }
+        TutorialStep step = steps[current];
+        if (!step.restrictCard)
+        {
+            return true;
+        }
+        CardConstruction construction = card as CardConstruction;
+        return construction != null && construction.Type == step.allowedCard;
+    }
+    public bool IsPlayAllowed()
+    {
+        if (steps == null || current >= steps.Count)
+        {
+            return true;
+        }
+        return !steps[current].blockPlay;
+    }
+    public void OnPanelClicked()
+    {
+        if (steps == null || current >= steps.Count)
+        {
+            return;
+        }
+        if (steps[current].trigger != TutorialTrigger.Continue)
+        {
+            return;
+        }
+        current++;
+        while(current < steps.Count && steps[current].trigger != TutorialTrigger.Continue && happened.Contains(steps[current].trigger))
+        {
+            current++;
+        }
+        ShowStep(current);
     }
 }

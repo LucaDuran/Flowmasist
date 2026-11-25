@@ -10,6 +10,7 @@ public class CardPlacementManager : MonoBehaviour
     [SerializeField] private HandUI handUI;
     [SerializeField] private ProductionManager productionManager;
     [SerializeField] private RoundManager roundManager;
+    [SerializeField] private TutorialManager tutorialManager;
     [SerializeField] private Color rejectColor = new Color(1f, 0.2f, 0.2f, 0.6f);
     [SerializeField] private Material ghostMaterial;
     [SerializeField] private float ghostRejectDuration = 0.3f;
@@ -68,6 +69,11 @@ public class CardPlacementManager : MonoBehaviour
         if (!roundManager.IsSetup)
         {
             Debug.LogWarning("Cannot select card before round setup.");
+            return;
+        }
+        if (tutorialManager != null && !tutorialManager.IsCardAllowed(card))
+        {
+            cardUI.Shake();
             return;
         }
         if (deckManager.Hand.Contains(card))

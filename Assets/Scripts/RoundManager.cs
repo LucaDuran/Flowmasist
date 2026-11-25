@@ -19,6 +19,7 @@ public class RoundManager : MonoBehaviour
     [SerializeField] private CardPlacementManager cardPlacementManager;
     [SerializeField] private Button executeButton;
     [SerializeField] private Button discardButton;
+    [SerializeField] private TutorialManager tutorialManager;
     private IReadOnlyList<ItemQuota> quotas;
     private int[] delivered = new int[Enum.GetValues(typeof(ItemType)).Length];
     private int executionTicks;
@@ -59,6 +60,10 @@ public class RoundManager : MonoBehaviour
     }
     public void OnExecuteButtonPressed()
     {
+        if (tutorialManager != null && !tutorialManager.IsPlayAllowed())
+        {
+            return;
+        }
         if (phase !=RoundPhase.Setup)
         {
             return;
