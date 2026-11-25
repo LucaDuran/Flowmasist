@@ -10,6 +10,7 @@ public abstract class ConstructionBehaviour : MonoBehaviour
     public virtual bool HasItem => cell != null && cell.ResourceItem != null;
     public virtual bool AcceptsFromBelt => false;
     protected List<Cell> occupiedCells = new List<Cell>();
+    public IReadOnlyList<Cell> OcuppiedCells => occupiedCells;
     public Vector2Int GridPosition => cell.GridPosition;
     public Vector2Int Facing => facing;
     public virtual void StopProduction() { }

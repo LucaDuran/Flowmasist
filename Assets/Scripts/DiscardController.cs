@@ -38,6 +38,7 @@ public class DiscardController : MonoBehaviour
                     cards.Add(cardUI.Card);
                 }
                 deckManager.DiscardCards(cards);
+                cardPlacementManager.ClearUndoHistory();
             }
             selectedCards.Clear();
             isDiscarding = false;

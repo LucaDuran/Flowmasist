@@ -14,6 +14,14 @@ public class DeckManager : MonoBehaviour
     private List<Card> discardPile = new List<Card>();
     public int DiscardsLeft => maxDiscards - discardsUsed;
     public int MaxCardsPerDiscard => maxCardsPerDiscard;
+    private List<Card> drawLog = new List<Card>();
+    private Queue<Card> forcedDraws = new Queue<Card>();
+    public class DeckState
+    {
+        public List<Card> hand;
+        public List<Card> deck;
+        public List<Card> discard;
+    }
     public void StartDeck(DeckData deckData)
     {
         actualDeck = new List<Card>(deckData.Cards);
@@ -21,20 +29,32 @@ public class DeckManager : MonoBehaviour
     }
     public Card DrawCard()
     {
-        if (actualDeck.Count == 0)
+        Card cardStole = null;
+        while (forcedDraws.Count > 0 && cardStole == null)
         {
-            ReshuffleDiscardPile();
+            Card forced = forcedDraws.Dequeue();
+            if (RemoveOne(actualDeck, forced) || RemoveOne(discardPile, forced))
+            {
+                cardStole = forced;
+            }
         }
-        if (actualDeck.Count == 0)
+        if (cardStole == null)
         {
-            Debug.Log("No cards left to draw.");
-            return null;
+            if (actualDeck.Count == 0)
+            {
+                ReshuffleDiscardPile();
+            }
+            if (actualDeck.Count == 0)
+            {
+                Debug.Log("No cards left to draw.");
+                return null;
+            }
+            int index = Random.Range(0, actualDeck.Count);
+            cardStole = actualDeck[index];
+            actualDeck.RemoveAt(index);
         }
-        int index = Random.Range(0, actualDeck.Count);
-        Card cardStole = actualDeck[index];
         hand.Add(cardStole);
-        actualDeck.RemoveAt(index);
-        Debug.Log(cardStole);
+        drawLog.Add(cardStole);
         return cardStole;
     }
     private void ReshuffleDiscardPile()
@@ -96,5 +116,46 @@ public class DeckManager : MonoBehaviour
                 break;
             }
         }
+    }
+    public DeckState SaveState()
+    {
+        return new DeckState
+        {
+            hand = new List<Card>(hand),
+            deck = new List<Card>(actualDeck),
+            discard = new List<Card>(discardPile)
+        };
+    }
+    public void RestoreState(DeckState state, List<Card> redraw)
+    {
+        hand.Clear();
+        hand.AddRange(state.hand);
+        actualDeck.Clear();
+        actualDeck.AddRange(state.deck);
+        discardPile.Clear();
+        discardPile.AddRange(state.discard);
+        List<Card> queue = new List<Card>(redraw);
+        queue.AddRange(forcedDraws);
+        forcedDraws = new Queue<Card>(queue);
+    }
+    public void ClearDrawLog()
+    {
+        drawLog.Clear();
+    }
+    public List<Card> TakeDrawLog()
+    {
+        List<Card> copy = new List<Card>(drawLog);
+        drawLog.Clear();
+        return copy;
+    }
+    private bool RemoveOne(List<Card> list, Card card)
+    {
+        int index = list.IndexOf(card);
+        if (index < 0)
+        {
+            return false;
+        }
+        list.RemoveAt(index);
+        return true;
     }
 }

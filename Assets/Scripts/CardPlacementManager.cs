@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 public class CardPlacementManager : MonoBehaviour
 {
     [SerializeField] private LevelCreator levelCreator;
@@ -10,11 +11,11 @@ public class CardPlacementManager : MonoBehaviour
     [SerializeField] private HandUI handUI;
     [SerializeField] private ProductionManager productionManager;
     [SerializeField] private RoundManager roundManager;
-    [SerializeField] private TutorialManager tutorialManager;
     [SerializeField] private Color rejectColor = new Color(1f, 0.2f, 0.2f, 0.6f);
     [SerializeField] private Material ghostMaterial;
     [SerializeField] private float ghostRejectDuration = 0.3f;
     [SerializeField] private int maxDragLength = 4;
+    [SerializeField] private TutorialManager tutorialManager;
     private List<Cell> dragPath = new List<Cell>();
     private List<GameObject> dragGhosts = new List<GameObject>();
     private bool hasLastFacingOverride;
@@ -32,8 +33,23 @@ public class CardPlacementManager : MonoBehaviour
     private int lastPreviewCost = -2;
     private int beltsUsed;
     private List<ConstructionBehaviour> placedPieces = new List<ConstructionBehaviour>();
+    private class FacingChange
+    {
+        public ConstructionBehaviour piece;
+        public Vector2Int oldFacing;
+    }
+    private class PlacementRecord
+    {
+        public List<ConstructionBehaviour> pieces = new List<ConstructionBehaviour>();
+        public List<FacingChange> facingChanges = new List<FacingChange>();
+        public int energyCost;
+        public DeckManager.DeckState deckBefore;
+        public List<Card> drawnCards = new List<Card>();
+    }
     public int EnergyUsed => movesUsed;
     public int BeltsUsed => beltsUsed;
+    private List<PlacementRecord> history = new List<PlacementRecord>();
+    private PlacementRecord currentRecord;
     public string LayoutString
     {
         get
@@ -46,6 +62,8 @@ public class CardPlacementManager : MonoBehaviour
             return string.Join(";", tokens);
         }
     }
+
+            
     private string PieceLetter(ConstructionBehaviour piece)
     {
         if (piece is Extractor) return "E";
@@ -61,6 +79,7 @@ public class CardPlacementManager : MonoBehaviour
         movesUsed = 0;
         beltsUsed = 0;
         placedPieces.Clear();
+        history.Clear();
         maxMoves = levelData.Energy;
         NotifyEnergy();
     }
@@ -163,13 +182,21 @@ public class CardPlacementManager : MonoBehaviour
             RejectPlacement();
             return;
         }
+        PlacementRecord record = new PlacementRecord();
+        record.deckBefore = deckManager.SaveState();
+        currentRecord = record;
         BuildAt(cellSelected, construction, pendingFacing);
         if (construction.Type == CardConstruction.ConstructionType.ConveyorBelt)
         {
             SnaptToArm(GetBehaviourAt(cellSelected.GridPosition));
         }
+        currentRecord = null;
+        record.energyCost = energyCost;
+        deckManager.ClearDrawLog();
         deckManager.DiscardCard(cardSelected);
         deckManager.DealCards();
+        record.drawnCards = deckManager.TakeDrawLog();
+        history.Add(record);
         handUI.RefreshHand();
         movesUsed += energyCost;
         NotifyEnergy();
@@ -214,6 +241,10 @@ public class CardPlacementManager : MonoBehaviour
             beltsUsed++;
         }
         placedPieces.Add(behaviour);
+        if (currentRecord != null)
+        {
+            currentRecord.pieces.Add(behaviour);
+        }
         OnPiecePlaced?.Invoke(behaviour);
     }
     private string FacingSymbol(Vector2Int facing)
@@ -267,6 +298,10 @@ public class CardPlacementManager : MonoBehaviour
     }
     private void Reorient(ConstructionBehaviour piece, Vector2Int direction)
     {
+        if (currentRecord != null)
+        {
+            currentRecord.facingChanges.Add(new FacingChange { piece = piece, oldFacing = piece.Facing });
+        }
         piece.SetFacing(direction);
         piece.transform.rotation = FacingToRotation(direction);
     }
@@ -535,6 +570,10 @@ public class CardPlacementManager : MonoBehaviour
             dragPath.Clear();
             return;
         }
+        PlacementRecord record = new PlacementRecord();
+        record.deckBefore = deckManager.SaveState();
+        currentRecord = record;
+        deckManager.ClearDrawLog();
         for (int i = 0; i < dragPath.Count; i++)
         {
             BuildAt(dragPath[i], construction, GetDragFacing(i));
@@ -552,7 +591,11 @@ public class CardPlacementManager : MonoBehaviour
                 TurnTowardAcceptor(lastPiece);
             }
         }
+        currentRecord = null;
+        record.energyCost = totalCost;
         deckManager.DealCards();
+        record.drawnCards = deckManager.TakeDrawLog();
+        history.Add(record);
         handUI.RefreshHand();
         movesUsed += totalCost;
         NotifyEnergy();
@@ -728,6 +771,10 @@ public class CardPlacementManager : MonoBehaviour
                 FinishDrag();
             }
         }
+        if (Input.GetKeyDown(KeyCode.Z) && Input.GetKey(KeyCode.LeftControl))
+        {
+            UndoLast();
+        }
     }
     public static event Action<int, int> OnEnergyChange;
     public static event Action<ConstructionBehaviour> OnPiecePlaced;
@@ -744,5 +791,49 @@ public class CardPlacementManager : MonoBehaviour
         }
         lastPreviewCost = cost;
         OnCostPreview?.Invoke(cost);
+    }
+    public void ClearUndoHistory()
+    {
+        history.Clear();
+    }
+    public void UndoLast()
+    {
+        if (!roundManager.IsSetup || isDragging || history.Count == 0)
+        {
+            return;
+        }
+        if (tutorialManager != null && tutorialManager.IsActive)
+        {
+            return;
+        }
+        CancelSelection();
+        PlacementRecord record = history[history.Count - 1];
+        history.RemoveAt(history.Count - 1);
+        for (int i = record.facingChanges.Count -1; i >= 0; i--)
+        {
+            FacingChange change = record.facingChanges[i];
+            if (change.piece != null)
+            {
+                change.piece.SetFacing(change.oldFacing);
+                change.piece.transform.rotation = FacingToRotation(change.oldFacing);
+            }
+        }
+        foreach(ConstructionBehaviour piece in record.pieces)
+        {
+            foreach (Cell ocuppied in piece.OcuppiedCells)
+            {
+                ocuppied.SetCurrentConstruction(null);
+            }
+            if (piece is ConveyorBelt)
+            {
+                beltsUsed--;
+            }
+            placedPieces.Remove(piece);
+            Destroy(piece.gameObject);
+        }
+        movesUsed -= record.energyCost;
+        deckManager.RestoreState(record.deckBefore, record.drawnCards);
+        handUI.RefreshHand();
+        NotifyEnergy();
     }
 }
