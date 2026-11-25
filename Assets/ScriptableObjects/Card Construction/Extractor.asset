@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Extractor
   m_EditorClassIdentifier: 
   cardName: Extractor
-  cardIcon: {fileID: 0}
+  cardIcon: {fileID: 21300000, guid: a66a9c2e54783a24f945299d9b561873, type: 3}
   moveCost: 20
   shopPrice: 0
   constructionType: 0

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ConveyorBelt
   m_EditorClassIdentifier: 
   cardName: ConveyorBelt
-  cardIcon: {fileID: 0}
+  cardIcon: {fileID: 21300000, guid: 5c960177f6d895f448aa144e31c9d0c0, type: 3}
   moveCost: 5
   shopPrice: 0
   constructionType: 2
