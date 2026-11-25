@@ -52,7 +52,7 @@ public class LevelCreator : MonoBehaviour
         Center = cellFather.position + new Vector3(width / 2, 0, depth / 2);
         Size = new Vector2(width + cellSize, depth + cellSize);
     }
-    private List<string> ParseMap(TextAsset map)
+    public List<string> ParseMap(TextAsset map)
     {
         List<string> lines = new List<string>();
         foreach (string rawLine in map.text.Split('\n'))

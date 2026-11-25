@@ -13,5 +13,6 @@ public struct RoundResult
     public int BeltsUsed;
     public string LevelName;
     public string Layout;
+    public string Board;
     public List<ObjectiveResult> Objectives;
 }

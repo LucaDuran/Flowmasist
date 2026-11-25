@@ -72,7 +72,8 @@ public class TelemetryManager : MonoBehaviour
             energy_max = energyMax,
             belts_used = result.BeltsUsed,
             planning_sec = planningSeconds,
-            layout = result.Layout
+            layout = result.Layout,
+            board = result.Board
         };
         StartCoroutine(Send(data));
     }

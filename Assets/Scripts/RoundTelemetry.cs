@@ -20,4 +20,5 @@ public class RoundTelemetry
     public int belts_used;
     public int planning_sec;
     public string layout;
+    public string board;
 }

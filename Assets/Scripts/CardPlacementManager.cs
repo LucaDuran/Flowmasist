@@ -33,6 +33,7 @@ public class CardPlacementManager : MonoBehaviour
     private int lastPreviewCost = -2;
     private int beltsUsed;
     private List<ConstructionBehaviour> placedPieces = new List<ConstructionBehaviour>();
+    private List<string> mapLines = new List<string>();
     private class FacingChange
     {
         public ConstructionBehaviour piece;
@@ -62,6 +63,56 @@ public class CardPlacementManager : MonoBehaviour
             return string.Join(";", tokens);
         }
     }
+    public string BoardString
+    {
+        get
+        {
+            int rows = mapLines.Count;
+            if (rows == 0)
+            {
+                return "";
+            }
+            int columns = mapLines[0].Length;
+            char[,] board = new char[rows, columns];
+            for (int row = 0; row < rows; row++)
+            {
+                for (int column = 0; column < columns; column++)
+                {
+                    board[row, column] = mapLines[row][column];
+                }
+            }
+            foreach (ConstructionBehaviour piece in placedPieces)
+            {
+                char symbol = PieceLetter(piece)[0];
+                if (piece is ConveyorBelt)
+                {
+                    symbol = FacingSymbol(piece.Facing)[0];
+                }
+                foreach (Cell ocuppied in piece.OcuppiedCells)
+                {
+                    Vector2Int position = ocuppied.GridPosition;
+                    board[position.x, position.y] = symbol;
+                }
+            }
+            System.Text.StringBuilder text = new System.Text.StringBuilder();
+            text.Append(" ");
+            for (int column = 0; column<columns; column++)
+            {
+                text.Append(column % 10);
+            }
+            for (int row = 0; row < rows; row++)
+            {
+                text.Append('\n');
+                text.Append(row % 100);
+                text.Append("| ");
+                for (int column = 0; column<columns; column++)
+                {
+                    text.Append(board[row, column]);
+                }
+            }
+            return text.ToString();
+        }
+    }
 
             
     private string PieceLetter(ConstructionBehaviour piece)
@@ -80,6 +131,7 @@ public class CardPlacementManager : MonoBehaviour
         beltsUsed = 0;
         placedPieces.Clear();
         history.Clear();
+        mapLines = levelCreator.ParseMap(levelData.Map);
         maxMoves = levelData.Energy;
         NotifyEnergy();
     }

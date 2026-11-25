@@ -121,7 +121,8 @@ public class RoundManager : MonoBehaviour
             EnergyUsed = stats.EnergyUsed,
             BeltsUsed = stats.BeltsUsed,
             LevelName = levelName,
-            Layout = cardPlacementManager.LayoutString
+            Layout = cardPlacementManager.LayoutString,
+            Board = cardPlacementManager.BoardString
         };
         OnRoundFinished?.Invoke(result);
     }
